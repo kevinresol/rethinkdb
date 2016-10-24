@@ -20,20 +20,27 @@ class RunTests {
 		});
 		
 		
-		// var expr = new Expr(TMakeArray([1,2,3]));
-		// expr = expr.map(function(v) return v.mul(1));
-		// trace(expr.toString());
-		// retain();
-		// expr.run(conn).handle(function(o) {
-		// 	trace(o.sure());
-		// 	release();
-		// });
-		
-		var expr = r.table('users').map(function(user) return user.getField('age')).reduce(function(x, y) return x + y);
-		trace(expr.toString());
+		retain();
+		r.expr([1,2,3]).map(function(v) return v.mul(v)).run(conn).handle(function(o) {
+			trace(o.sure());
+			release();
+		});
 		
 		retain();
-		expr.run(conn).handle(function(o) {
+		r.table('users').map(function(user) return user.getField('age')).reduce(function(x, y) return x + y).run(conn).handle(function(o) {
+			trace(o.sure());
+			release();
+		});
+		
+		retain();
+		r.uuid().run(conn).handle(function(o) {
+			trace(o.sure());
+			release();
+		});
+		
+		var f:Expr = function(a) return (1:Expr);
+		retain();
+		r.do_([1], f).run(conn).handle(function(o) {
 			trace(o.sure());
 			release();
 		});

@@ -32,6 +32,18 @@ class Connection {
 		});
 	}
 	
+	public function close():Surprise<Noise, Error> {
+		throw "Not implemented";
+	}
+	
+	public function reconnect():Surprise<Connection, Error>  {
+		throw "Not implemented";
+	}
+	
+	public function use(dbName:String) {
+		throw "Not implemented";
+	}
+	
 	public function query(query:Query) {
 		var future = Future.async(function(cb) {
 			var link:CallbackLink = null;
