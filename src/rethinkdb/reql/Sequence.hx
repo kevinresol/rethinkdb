@@ -4,7 +4,7 @@ import rethinkdb.reql.util.*;
 import tink.protocol.rethinkdb.Term;
 
 @:forward
-abstract Sequence(Expr) from Expr to Expr to Term {
+abstract Sequence(Expr) from Term to Term to Expr {
 	
 	// Joins
 	public inline function innerJoin(v:Sequence, f:Expr->Expr->Expr):Stream
@@ -19,9 +19,9 @@ abstract Sequence(Expr) from Expr to Expr to Term {
 		return TMap([this, (f:Expr)]);
 		
 	// Geospatial commands
-	public inline function includes(v:Geometry):Sequence
+	public inline function includes(v:Expr):Sequence
 		return TIncludes([this, v]);
-	public inline function intersects(v:Geometry):Sequence
+	public inline function intersects(v:Expr):Sequence
 		return TIntersects([this, v]);
 	
 }

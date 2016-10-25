@@ -1,9 +1,12 @@
 package rethinkdb.reql;
 
+import rethinkdb.Connection;
 import tink.protocol.rethinkdb.Term;
 
-@:forward
+// @:forward
 abstract Db(Expr) from Expr to Expr {
+	public inline function run(conn:Connection)
+		return this.run(conn);
 	public inline function tableCreate(name:String):Expr
 		return TTableCreate(name);
 	public inline function tableDrop(name:String):Expr

@@ -5,7 +5,7 @@ import tink.protocol.rethinkdb.Term;
 import tink.protocol.rethinkdb.Datum;
 
 @:forward
-abstract Table(Expr) from Expr to Expr to Term {
+abstract Table(Expr) from Term to Term to Expr {
 	
 	public inline function indexCreate(name:String):Expr
 		return TIndexCreate(name);
@@ -39,8 +39,8 @@ abstract Table(Expr) from Expr to Expr to Term {
 	public inline function between(lower:Expr, upper:Expr):TableSlice
 		return TBetween([this, lower, upper]);
 		
-	public inline function getIntersecting(v:Geometry):Expr
+	public inline function getIntersecting(v:Expr):Expr
 		return TGetIntersecting([this, v]);
-	public inline function getNearest(v:Point):Expr
+	public inline function getNearest(v:Expr):Expr
 		return TGetNearest([this, v]);
 }

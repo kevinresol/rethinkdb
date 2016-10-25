@@ -3,7 +3,7 @@ package rethinkdb.reql;
 import tink.protocol.rethinkdb.Term;
 
 @:forward
-abstract Geometry(Expr) from Expr to Expr to Term {
+abstract Geometry(Term) from Term to Term {
 	
 	public inline function distance(v:Geometry):Number
 		return TDistance([this, v]);

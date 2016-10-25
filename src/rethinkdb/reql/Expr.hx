@@ -74,6 +74,10 @@ abstract Expr(Term) from Term to Term {
 	@:arrayAccess
 	public inline function opGetField(v:String)
 		return getField(v);
+		
+	@:to
+	public inline function toTerm():Term
+		return this;
 	
 	
 	// Transformation

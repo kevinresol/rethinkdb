@@ -92,7 +92,7 @@ class RethinkDB {
 	public inline function geojson(v:Dynamic):Geometry
 		return TGeojson([TDatum(Datum.fromDynamic(v))]);
 	public inline function intersects(v1:Expr, v2:Geometry):Expr
-		return TIntersects([v1, v2]);
+		return TIntersects([(v1:Term), v2]);
 	public inline function line(v:Array<Point>):Line
 		return TLine(v);
 	public inline function point(long:Float, lat:Float):Point

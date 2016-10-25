@@ -3,7 +3,7 @@ package rethinkdb.reql.util;
 import tink.protocol.rethinkdb.Term;
 import tink.protocol.rethinkdb.Datum;
 
-abstract Function(Expr) from Expr to Expr {
+abstract Function(Term) to Term {
 	@:from
 	public static inline function ofFunc1(f:Expr->Expr):Function
 		return Expr.ofFunc1(f);

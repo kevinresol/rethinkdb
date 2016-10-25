@@ -5,7 +5,7 @@ import tink.protocol.rethinkdb.Term;
 import tink.protocol.rethinkdb.Datum;
 
 @:forward
-abstract TableSlice(Expr) from Expr to Expr to Term {
+abstract TableSlice(Term) from Term to Term {
 	
 	
 	public inline function between(lower:Expr, upper:Expr):TableSlice

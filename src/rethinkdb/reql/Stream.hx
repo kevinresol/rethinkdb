@@ -3,7 +3,7 @@ package rethinkdb.reql;
 import tink.protocol.rethinkdb.Term;
 
 @:forward
-abstract Stream(Expr) from Expr to Expr to Term {
+abstract Stream(Expr) from Term to Term to Expr {
 	
 	// Selecting data
 	public inline function filter(f:Expr->Expr):Stream

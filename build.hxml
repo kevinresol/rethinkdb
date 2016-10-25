@@ -3,4 +3,3 @@ tests.hxml
 -lib rethinkdb
 -lib hxnodejs
 -js bin/node/tests.js
--dce full

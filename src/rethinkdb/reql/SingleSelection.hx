@@ -4,7 +4,7 @@ import rethinkdb.reql.util.*;
 import tink.protocol.rethinkdb.Term;
 
 @:forward
-abstract SingleSelection(Expr) from Expr to Expr to Term {
+abstract SingleSelection(Expr) from Term to Term {
 	
 	// Writing data
 	public inline function update(v:ObjectOrFunction):Expr
