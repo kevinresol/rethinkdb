@@ -8,6 +8,37 @@ import tink.protocol.rethinkdb.Datum;
 using tink.CoreApi;
 
 @:forward
+abstract Exprs(Array<Expr>) from Array<Expr> to Array<Expr> from Array<Term> to Array<Term> to TermArgs {
+	@:from
+	public static inline function ofSingle(v:Expr):Exprs
+		return [v];
+	@:from
+	public static inline function ofInt(v:Int):Exprs
+		return ofSingle(TDatum(v));
+	@:from
+	public static inline function ofFloat(v:Float):Exprs
+		return ofSingle(TDatum(v));
+	@:from
+	public static inline function ofString(v:String):Exprs
+		return ofSingle(TDatum(v));
+	@:from
+	public static inline function ofBool(v:Bool):Exprs
+		return ofSingle(TDatum(v));
+	@:from
+	public static inline function ofInts(v:Array<Int>):Exprs
+		return [for(i in v) TDatum(i)];
+	@:from
+	public static inline function ofFloats(v:Array<Float>):Exprs
+		return [for(i in v) TDatum(i)];
+	@:from
+	public static inline function ofStrings(v:Array<String>):Exprs
+		return [for(i in v) TDatum(i)];
+	@:from
+	public static inline function ofBools(v:Array<Bool>):Exprs
+		return [for(i in v) TDatum(i)];
+}
+
+@:forward
 abstract Expr(Term) from Term to Term {
 	
 	static var varId:Int = 1;
@@ -79,6 +110,33 @@ abstract Expr(Term) from Term to Term {
 	public inline function toTerm():Term
 		return this;
 	
+	// Accessing ReQL
+	public inline function changes():Expr
+		return TChanges(this);
+	
+	// Writing data
+	public inline function update(v:ObjectOrFunction):Expr
+		return TUpdate([this, v]);
+	public inline function replace(v:ObjectOrFunction):Expr
+		return TReplace([this, v]);
+	public inline function delete():Expr
+		return TDelete(this);
+	
+	// Selecting data
+	public inline function between(lower:Expr, upper:Expr):Expr
+		return TBetween([this, lower, upper]);
+	public inline function filter(f:Expr->Expr):Expr
+		return TFilter([this, (f:Expr)]);
+	
+	// Joins
+	public inline function innerJoin(v:Expr, f:Expr->Expr->Expr):Expr
+		return TInnerJoin([this, v, (f:Expr)]);
+	public inline function outerJoin(v:Expr, f:Expr->Expr->Expr):Expr
+		return TOuterJoin([this, v, (f:Expr)]);
+	public inline function eqJoin(v:Expr, table:Table):Expr
+		return TEqJoin([this, v, table]);
+	public inline function zip():Expr
+		return TZip(this);
 	
 	// Transformation
 	public inline function map(f:Expr->Expr):Expr
@@ -140,8 +198,6 @@ abstract Expr(Term) from Term to Term {
 		return TContains(this.concat(v));
 		
 	// Document manipulation
-	public inline function row():Expr
-		return TImplicitVar(this);
 	public inline function pluck(v:Array<String>):Expr
 		return TPluck(this.concat(v));
 	public inline function without(v:Array<Expr>):Expr
@@ -152,23 +208,23 @@ abstract Expr(Term) from Term to Term {
 		return TAppend([this, v]);
 	public inline function prepend(v:Expr):Expr
 		return TPrepend([this, v]);
-	public inline function difference(v:TermArgs):Expr
+	public inline function difference(v:Exprs):Expr
 		return TDifference(this.concat(v));
 	public inline function setInsert(v:Expr):Expr
 		return TSetInsert([this, v]);
-	public inline function setUnion(v:TermArgs):Expr
+	public inline function setUnion(v:Exprs):Expr
 		return TSetUnion(this.concat(v));
-	public inline function setIntersection(v:TermArgs):Expr
+	public inline function setIntersection(v:Exprs):Expr
 		return TSetIntersection(this.concat(v));
-	public inline function setDifference(v:TermArgs):Expr
+	public inline function setDifference(v:Exprs):Expr
 		return TSetDifference(this.concat(v));
 	public inline function getField(v:String):Expr
 		return TGetField([this, TDatum(v)]);
-	public inline function hasFields(v:TermArgs):Expr
+	public inline function hasFields(v:Exprs):Expr
 		return THasFields(this.concat(v));
 	public inline function insertAt(offset:Int, v:Expr):Expr
 		return TInsertAt([this, TDatum(offset), v]);
-	public inline function spliceAt(offset:Int, v:TermArgs):Expr
+	public inline function spliceAt(offset:Int, v:Exprs):Expr
 		return TSpliceAt([this, TDatum(offset)].concat(v));
 	public inline function deleteAt(offset:Int, ?end:Int):Expr
 		return TDeleteAt({
@@ -182,10 +238,6 @@ abstract Expr(Term) from Term to Term {
 		return TKeys(this);
 	public inline function values():Expr
 		return TValues(this);
-	public inline function literal(v:Expr):Expr
-		return TLiteral([this, v]);
-	public inline function object(v:Array<Named<Datum>>):Expr
-		return TObject([this, TDatum(DObject(v))]);
 
 	// String manipulation
 	public inline function match(v:String):Expr
@@ -217,9 +269,9 @@ abstract Expr(Term) from Term to Term {
 		return TAnd(this.concat(v));
 	public inline function or(v:Array<Bool>):Expr
 		return TOr(this.concat(v));
-	public inline function eq(v:TermArgs):Expr
+	public inline function eq(v:Exprs):Expr
 		return TEq(this.concat(v));
-	public inline function ne(v:TermArgs):Expr
+	public inline function ne(v:Exprs):Expr
 		return TNe(this.concat(v));
 	public inline function gt(v:Array<Float>):Expr
 		return TGt(this.concat(v));
@@ -271,7 +323,7 @@ abstract Expr(Term) from Term to Term {
 		return TToEpochTime(this);
 	
 	// Control structures
-	public inline function do_(?args:TermArgs, func:Expr):Expr
+	public inline function do_(?args:Exprs, func:Expr):Expr
 		return TFuncall({
 			var a = [this, func];
 			if(args != null) a = a.concat(args);
@@ -294,7 +346,21 @@ abstract Expr(Term) from Term to Term {
 	public inline function toJson():Expr
 		return TToJsonString(this);
 	
-	
+	// Geospatial commands
+	public inline function circle(point:Expr, radius:Expr)
+		return TCircle([this, point, radius]);
+	public inline function distance(v:Expr)
+		return TDistance([this, v]);
+	public inline function fill()
+		return TFill(this);
+	public inline function toGeojson():Expr
+		return TToGeojson(this);
+	public inline function includes(v:Expr):Expr
+		return TIncludes([this, v]);
+	public inline function intersects(v:Expr):Expr
+		return TIntersects([this, v]);
+	public inline function polygonSub(v:Expr):Expr
+		return TPolygonSub([this, v]);
 }
 
 enum OrderByKind {

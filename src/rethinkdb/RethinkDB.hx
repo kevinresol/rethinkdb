@@ -1,7 +1,9 @@
 package rethinkdb;
 
 import haxe.io.Bytes;
-import rethinkdb.reql.*;
+import rethinkdb.reql.Expr;
+import rethinkdb.reql.Db;
+import rethinkdb.reql.Table;
 import tink.protocol.rethinkdb.Term;
 import tink.protocol.rethinkdb.Datum;
 
@@ -35,9 +37,78 @@ class RethinkDB {
 	public inline function table(name:String):Table
 		return TTable(name);
 		
-	// 
+	// Transformation
+	public inline function map(v:Expr, f:Expr->Expr):Expr
+		return TMap([v, (f:Expr)]);
+	public inline function union(v:Exprs):Expr
+		return TUnion(v);
+		
+	// Aggregation
+	public inline function group(v:Expr, f:Expr):Expr
+		return TGroup([v, f]);
+	public inline function reduce(v:Expr, f:Expr->Expr->Expr):Expr
+		return TReduce([v, (f:Expr)]);
+	public inline function fold(s:Expr, base:Expr, f:Expr->Expr->Expr):Expr
+		return TFold([s, base, (f:Expr)]);
+	public inline function count(v:Expr):Expr // TODO: optional arguments
+		return TCount(v);
+	public inline function sum(v:Expr):Expr // TODO: optional arguments
+		return TSum(v);
+	public inline function avg(v:Expr):Expr
+		return TAvg(v);
+	public inline function min(v:Expr):Expr
+		return TMin(v);
+	public inline function max(v:Expr):Expr
+		return TMax(v);
+	public inline function distinct(v:Expr):Expr
+		return TDistinct(v);
+	public inline function contains(s:Expr, v:Expr):Expr
+		return TContains([s, v]);
+	
+	// Document manipulation
+	public var row:Expr = TImplicitVar([]);
+	public inline function literal(v:Expr):Expr
+		return TLiteral(v);
+	public inline function object(v:Exprs):Expr
+		return TObject(v);
+	
+	// Math and logic
+	public inline function add(v:Exprs):Expr
+		return TAdd(v);
+	public inline function sub(v:Exprs):Expr
+		return TSub(v);
+	public inline function mul(v:Exprs):Expr
+		return TMul(v);
+	public inline function div(v:Exprs):Expr
+		return TDiv(v);
+	public inline function mod(v:Exprs):Expr
+		return TMod(v);
+	public inline function and(v:Exprs):Expr
+		return TAnd(v);
+	public inline function or(v:Exprs):Expr
+		return TOr(v);
+	public inline function eq(v:Exprs):Expr
+		return TEq(v);
+	public inline function ne(v:Exprs):Expr
+		return TNe(v);
+	public inline function gt(v:Exprs):Expr
+		return TGt(v);
+	public inline function ge(v:Exprs):Expr
+		return TGe(v);
+	public inline function lt(v:Exprs):Expr
+		return TLt(v);
+	public inline function le(v:Exprs):Expr
+		return TLe(v);
+	public inline function not(v:Expr):Expr
+		return TNot(v);
 	public inline function random():Expr
 		return TRandom([]);
+	public inline function round(v:Expr):Expr
+		return TRound([v]);
+	public inline function ceil(v:Expr):Expr
+		return TCeil([v]);
+	public inline function floor(v:Expr):Expr
+		return TFloor([v]);
 		
 	// Dates and times
 	public inline function now():Expr
@@ -48,20 +119,59 @@ class RethinkDB {
 		return TEpochTime([TDatum(seconds)]);
 	public inline function ISO8601(v:String):Expr
 		return TIso8601([TDatum(v)]);
+	public inline function sunday():Expr
+		return TSunday([]);
+	public inline function monday():Expr
+		return TMonday([]);
+	public inline function tuesday():Expr
+		return TTuesday([]);
+	public inline function wednesday():Expr
+		return TWednesday([]);
+	public inline function thursday():Expr
+		return TThursday([]);
+	public inline function friday():Expr
+		return TFriday([]);
+	public inline function saturday():Expr
+		return TSaturday([]);
+	public inline function january():Expr
+		return TJanuary([]);
+	public inline function february():Expr
+		return TFebruary([]);
+	public inline function march():Expr
+		return TMarch([]);
+	public inline function april():Expr
+		return TApril([]);
+	public inline function may():Expr
+		return TMay([]);
+	public inline function june():Expr
+		return TJune([]);
+	public inline function july():Expr
+		return TJuly([]);
+	public inline function august():Expr
+		return TAugust([]);
+	public inline function september():Expr
+		return TSeptember([]);
+	public inline function october():Expr
+		return TOctober([]);
+	public inline function november():Expr
+		return TNovember([]);
+	public inline function december():Expr
+		return TDecember([]);
+	
 		
 	// Control structures
-	public inline function args(v:TermArgs):Expr
+	public inline function args(v:Exprs):Expr
 		return TArgs(v);
 	public inline function binary(v:Bytes):Expr
 		return TBinary([TDatum(v)]);
-		
-	// Control structures
-	public inline function do_(?args:TermArgs, func:Expr):Expr
+	public inline function do_(?args:Exprs, func:Expr):Expr
 		return TFuncall({
 			var a = [func];
 			if(args != null) a = a.concat(args);
 			a;
 		});
+	public inline function branch(v:Expr, t:Expr, f:Expr):Expr
+		return TBranch([v, t, f]);
 	public inline function range(?start:Int, ?end:Int):Expr
 		return TRange({
 			var args = [];
@@ -75,6 +185,8 @@ class RethinkDB {
 		return TDatum(v);
 	public inline function js(v:String):Expr
 		return TJavascript(v);
+	public inline function typeOf(v:Expr):Expr
+		return TTypeOf(v);
 	public inline function info(v:Expr):Expr
 		return TInfo(v);
 	public inline function json(v:String):Expr
@@ -85,19 +197,37 @@ class RethinkDB {
 		return TUuid(v == null ? [] : v);
 	
 	// Geospatial commands
-	public inline function circle(point:Point, radius:Float):Geometry
-		return TCircle([point, TDatum(radius)]);
-	public inline function distance(v1:Geometry, v2:Geometry):Number
+	public inline function circle(point:Expr, radius:Expr):Expr
+		return TCircle([point, radius]);
+	public inline function distance(v1:Expr, v2:Expr):Expr
 		return TDistance([v1, v2]);
-	public inline function geojson(v:Dynamic):Geometry
-		return TGeojson([TDatum(Datum.fromDynamic(v))]);
-	public inline function intersects(v1:Expr, v2:Geometry):Expr
-		return TIntersects([(v1:Term), v2]);
-	public inline function line(v:Array<Point>):Line
+	public inline function geojson(v:Expr):Expr
+		return TGeojson(v);
+	public inline function intersects(v1:Expr, v2:Expr):Expr
+		return TIntersects([v1, v2]);
+	public inline function line(v:Exprs):Expr
 		return TLine(v);
-	public inline function point(long:Float, lat:Float):Point
-		return TPoint([TDatum(long), TDatum(lat)]);
-	public inline function polygon(v:Array<Point>):Polygon
+	public inline function point(long:Expr, lat:Expr):Expr
+		return TPoint([long, lat]);
+	public inline function polygon(v:Exprs):Expr
 		return TPolygon(v.concat([v[v.length - 1]]));
+	
+	// Administration
+	public inline function grant(s:Expr, v:Expr, opt:Expr):Expr
+		return TGrant([s, v, opt]);
+	public inline function wait(s:Expr, ?opt:Expr):Expr
+		return TWait({
+			var args = [s];
+			if(opt != null) args.push(opt);
+			args;
+		});
+		
+	// Others
+	public inline function asc(v:Expr):Expr
+		return TAsc(v);
+	public inline function desc(v:Expr):Expr
+		return TDesc(v);
+	public var maxval:Expr = TMaxval([]);
+	public var minval:Expr = TMinval([]);
 	
 }
