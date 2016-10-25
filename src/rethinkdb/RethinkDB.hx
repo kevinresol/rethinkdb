@@ -73,32 +73,32 @@ class RethinkDB {
 		return TObject(v);
 	
 	// Math and logic
-	public inline function add(v:Exprs):Expr
-		return TAdd(v);
-	public inline function sub(v:Exprs):Expr
-		return TSub(v);
-	public inline function mul(v:Exprs):Expr
-		return TMul(v);
-	public inline function div(v:Exprs):Expr
-		return TDiv(v);
-	public inline function mod(v:Exprs):Expr
-		return TMod(v);
-	public inline function and(v:Exprs):Expr
-		return TAnd(v);
-	public inline function or(v:Exprs):Expr
-		return TOr(v);
-	public inline function eq(v:Exprs):Expr
-		return TEq(v);
-	public inline function ne(v:Exprs):Expr
-		return TNe(v);
-	public inline function gt(v:Exprs):Expr
-		return TGt(v);
-	public inline function ge(v:Exprs):Expr
-		return TGe(v);
-	public inline function lt(v:Exprs):Expr
-		return TLt(v);
-	public inline function le(v:Exprs):Expr
-		return TLe(v);
+	public inline function add(v1:Expr, v2:Expr):Expr
+		return TAdd([v1, v2]);
+	public inline function sub(v1:Expr, v2:Expr):Expr
+		return TSub([v1, v2]);
+	public inline function mul(v1:Expr, v2:Expr):Expr
+		return TMul([v1, v2]);
+	public inline function div(v1:Expr, v2:Expr):Expr
+		return TDiv([v1, v2]);
+	public inline function mod(v1:Expr, v2:Expr):Expr
+		return TMod([v1, v2]);
+	public inline function and(v1:Expr, v2:Expr):Expr
+		return TAnd([v1, v2]);
+	public inline function or(v1:Expr, v2:Expr):Expr
+		return TOr([v1, v2]);
+	public inline function eq(v1:Expr, v2:Expr):Expr
+		return TEq([v1, v2]);
+	public inline function ne(v1:Expr, v2:Expr):Expr
+		return TNe([v1, v2]);
+	public inline function gt(v1:Expr, v2:Expr):Expr
+		return TGt([v1, v2]);
+	public inline function ge(v1:Expr, v2:Expr):Expr
+		return TGe([v1, v2]);
+	public inline function lt(v1:Expr, v2:Expr):Expr
+		return TLt([v1, v2]);
+	public inline function le(v1:Expr, v2:Expr):Expr
+		return TLe([v1, v2]);
 	public inline function not(v:Expr):Expr
 		return TNot(v);
 	public inline function random():Expr
@@ -164,12 +164,8 @@ class RethinkDB {
 		return TArgs(v);
 	public inline function binary(v:Bytes):Expr
 		return TBinary([TDatum(v)]);
-	public inline function do_(?args:Exprs, func:Expr):Expr
-		return TFuncall({
-			var a = [func];
-			if(args != null) a = a.concat(args);
-			a;
-		});
+	public inline function do_(f:Expr, ?a:Exprs):Expr
+		return TFuncall(a == null ? [f] : [f].concat(a));
 	public inline function branch(v:Expr, t:Expr, f:Expr):Expr
 		return TBranch([v, t, f]);
 	public inline function range(?start:Int, ?end:Int):Expr

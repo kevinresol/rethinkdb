@@ -75,13 +75,14 @@ abstract Expr(Term) from Term to Term {
 	}
 	
 	@:from
+	public static function ofBools(v:Array<Bool>):Expr
+		return TMakeArray([for(i in v) TDatum(i)]);
+	@:from
 	public static inline function ofString(v:String):Expr
 		return TDatum(v);
-	
 	@:from
 	public static inline function ofFloat(v:Float):Expr
 		return TDatum(v);
-	
 	@:from
 	public static inline function ofBool(v:Bool):Expr
 		return TDatum(v);
@@ -101,6 +102,27 @@ abstract Expr(Term) from Term to Term {
 	@:op(A%B)
 	public inline function opMod(b:Expr):Expr
 		return mod(b);
+	@:op(A==B)
+	public inline function opEq(b:Expr):Expr
+		return eq(b);
+	@:op(A!=B)
+	public inline function opNe(b:Expr):Expr
+		return ne(b);
+	@:op(A>B)
+	public inline function opGt(b:Expr):Expr
+		return gt(b);
+	@:op(A>=B)
+	public inline function opGe(b:Expr):Expr
+		return ge(b);
+	@:op(A<B)
+	public inline function opLt(b:Expr):Expr
+		return lt(b);
+	@:op(A<=B)
+	public inline function opLe(b:Expr):Expr
+		return le(b);
+	@:op(!A)
+	public inline function opNot():Expr
+		return not();
 		
 	@:arrayAccess
 	public inline function opGetField(v:String)
@@ -265,24 +287,24 @@ abstract Expr(Term) from Term to Term {
 		return TDiv([this, v]);
 	public inline function mod(v:Expr):Expr
 		return TMod([this, v]);
-	public inline function and(v:Array<Bool>):Expr
-		return TAnd(this.concat(v));
-	public inline function or(v:Array<Bool>):Expr
-		return TOr(this.concat(v));
-	public inline function eq(v:Exprs):Expr
-		return TEq(this.concat(v));
-	public inline function ne(v:Exprs):Expr
-		return TNe(this.concat(v));
-	public inline function gt(v:Array<Float>):Expr
-		return TGt(this.concat(v));
-	public inline function ge(v:Array<Float>):Expr
-		return TGe(this.concat(v));
-	public inline function lt(v:Array<Float>):Expr
-		return TLt(this.concat(v));
-	public inline function le(v:Array<Float>):Expr
-		return TLe(this.concat(v));
-	public inline function not(v:Bool):Expr
-		return TNot([this, TDatum(v)]);
+	public inline function and(v:Expr):Expr
+		return TAnd([this, v]);
+	public inline function or(v:Expr):Expr
+		return TOr([this, v]);
+	public inline function eq(v:Expr):Expr
+		return TEq([this, v]);
+	public inline function ne(v:Expr):Expr
+		return TNe([this, v]);
+	public inline function gt(v:Expr):Expr
+		return TGt([this, v]);
+	public inline function ge(v:Expr):Expr
+		return TGe([this, v]);
+	public inline function lt(v:Expr):Expr
+		return TLt([this, v]);
+	public inline function le(v:Expr):Expr
+		return TLe([this, v]);
+	public inline function not():Expr
+		return TNot(this);
 	public inline function round():Expr
 		return TRound(this);
 	public inline function ceil():Expr
@@ -323,12 +345,8 @@ abstract Expr(Term) from Term to Term {
 		return TToEpochTime(this);
 	
 	// Control structures
-	public inline function do_(?args:Exprs, func:Expr):Expr
-		return TFuncall({
-			var a = [this, func];
-			if(args != null) a = a.concat(args);
-			a;
-		});
+	public inline function do_(f:Expr):Expr
+		return TFuncall([f, this]);
 	public inline function branch(ifTrue:Expr, ifFalse:Expr):Expr
 		return TBranch([this, ifTrue, ifFalse]);
 	public inline function forEach(f:Expr->Expr):Expr

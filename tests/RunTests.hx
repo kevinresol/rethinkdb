@@ -21,13 +21,24 @@ class RunTests {
 		
 		
 		retain();
-		r.expr([1,2,3]).map(function(v) return v.mul(v)).run(conn).handle(function(o) {
+		r.expr([1,2,3]).map(function(v) return v * v).run(conn).handle(function(o) {
+			trace(o.sure());
+			release();
+		});
+		retain();
+		r.expr([1,2,3]).map(function(v) return v > 2).run(conn).handle(function(o) {
 			trace(o.sure());
 			release();
 		});
 		
 		retain();
-		r.table('users').map(function(user) return user.getField('age')).reduce(function(x, y) return x + y).run(conn).handle(function(o) {
+		r.expr([1,2,3]).map(function(v) return v == v).run(conn).handle(function(o) {
+			trace(o.sure());
+			release();
+		});
+		
+		retain();
+		r.table('users').map(function(user) return user['age']).reduce(function(x, y) return x + y).run(conn).handle(function(o) {
 			trace(o.sure());
 			release();
 		});
@@ -38,17 +49,18 @@ class RunTests {
 			release();
 		});
 		
-		var f:Expr = function(a) return (1:Expr);
 		retain();
-		r.do_([1], f).run(conn).handle(function(o) {
+		r.do_(function(a:Expr, b:Expr, c:Expr) return a + b + c, [1,2,3]).run(conn).handle(function(o) {
 			trace(o.sure());
 			release();
 		});
-		// retain();
-		// r.db('test').table('tink_protocol').map(function(r) return r.mul(r)).run(conn).handle(function(o) {
-		// 	trace(o.sure());
-		// 	release();
-		// });
+		
+		retain();
+		r.expr(100).do_(function(a:Expr) return a * a).run(conn).handle(function(o) {
+			trace(o.sure());
+			release();
+		});
+		
 	}
   
 }
