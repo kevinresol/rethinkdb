@@ -46,8 +46,10 @@ abstract Expr(Term) from Term to Term {
 	public inline function new(term:Term)
 		this = term;
 		
-	public inline function run(connection:Connection)
-		return connection.query(QStart(this));
+	public function run(connection:Connection) {
+		var query:Query = QStart(this);
+		return connection.query(query) >> function(r) return new Response(r, connection, query);
+	}
 	
 	@:from
 	public static function ofFunc1(f:Expr->Expr):Expr {

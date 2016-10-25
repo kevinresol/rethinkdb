@@ -4,7 +4,7 @@ import haxe.io.Bytes;
 import tink.tcp.Connection as TcpConnection;
 import tink.protocol.rethinkdb.Client;
 import tink.protocol.rethinkdb.Query;
-import tink.protocol.rethinkdb.RawResponse;
+// import tink.protocol.rethinkdb.RawResponse;
 import tink.protocol.rethinkdb.Response;
 import tink.streams.Accumulator;
 import tink.streams.Stream;
@@ -44,13 +44,13 @@ class Connection {
 		throw "Not implemented";
 	}
 	
-	public function query(query:Query) {
+	public function query(query:Query):Surprise<Response, Error> {
 		var future = Future.async(function(cb) {
 			var link:CallbackLink = null;
 			link = received.handle(function(res) {
 				if(res.token == query.token) {
 					res.convert({rawTime: false, rawBinary: false, rawGroups: false});
-					cb(Success(res.response));
+					cb(Success(res));
 					link.dissolve();
 				}
 			});
