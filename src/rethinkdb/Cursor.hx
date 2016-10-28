@@ -32,7 +32,7 @@ class Cursor<T> extends Generator<T> {
 			} else if(!firstResponse.isFeed()) {
 				cb(End);
 			} else if(nextResponse == null) {
-				nextResponse = connection.query(QContinue(firstResponse.token));
+				nextResponse = connection.query(QContinue(firstResponse.token)) >> function(r:rethinkdb.Response) return r.response;
 				nextResponse.handle(function(o) switch o {
 					case Success(res): addResponse(res); nextResponse = null; next();
 					case Failure(f): trace('fail');

@@ -5,16 +5,17 @@ import tink.tcp.Connection as TcpConnection;
 import tink.protocol.rethinkdb.Client;
 import tink.protocol.rethinkdb.Query;
 // import tink.protocol.rethinkdb.RawResponse;
-import tink.protocol.rethinkdb.Response;
+import tink.protocol.rethinkdb.Response as ProtocolResponse;
 import tink.streams.Accumulator;
 import tink.streams.Stream;
 
+using rethinkdb.Response;
 using tink.CoreApi;
 
 class Connection {
 	var client:Client;
 	var sender:Accumulator<Bytes>;
-	var received:Signal<Response>;
+	var received:Signal<ProtocolResponse>;
 	
 	public function new(?options:ConnectionOptions) {
 		if(options == null) options = {};
@@ -44,13 +45,17 @@ class Connection {
 		throw "Not implemented";
 	}
 	
+	public function server() {
+		return query(QServerInfo).asAtom();
+	}
+	
 	public function query(query:Query):Surprise<Response, Error> {
 		var future = Future.async(function(cb) {
 			var link:CallbackLink = null;
 			link = received.handle(function(res) {
 				if(res.token == query.token) {
 					res.convert({rawTime: false, rawBinary: false, rawGroups: false});
-					cb(Success(res));
+					cb(Success(new Response(res, this, query)));
 					link.dissolve();
 				}
 			});

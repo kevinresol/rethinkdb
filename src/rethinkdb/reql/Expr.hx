@@ -48,7 +48,7 @@ abstract Expr(Term) from Term to Term {
 		
 	public function run(connection:Connection) {
 		var query:Query = QStart(this);
-		return connection.query(query) >> function(r) return new Response(r, connection, query);
+		return connection.query(query);
 	}
 	
 	@:from
@@ -354,7 +354,7 @@ abstract Expr(Term) from Term to Term {
 	public inline function forEach(f:Expr->Expr):Expr
 		return TForEach([this, (f:Expr)]);
 	public inline function default_(v:Datum):Expr // TODO: function form
-		return TForEach([this, TDatum(v)]);
+		return TDefault([this, TDatum(v)]);
 	public inline function coerceTo(v:Expr):Expr // TODO: figure this out...
 		throw 'Not implemented';
 	public inline function typeOf():Expr

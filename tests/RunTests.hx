@@ -9,11 +9,12 @@ class RunTests {
 
 	static var count = 0;
 	static function retain() count ++;
-	static function release() if(--count == 0) travix.Logger.exit(0);
+	static function release() {}; //if(--count == 0) travix.Logger.exit(0);
 	
 	static function main() {
 		var conn = r.connect();
 		
+		new Test();
 		
 		retain();
 		r.db('rethinkdb').table('users').map(function(v) return 1).run(conn).asCursor().handle(function(o) {
@@ -22,7 +23,7 @@ class RunTests {
 			release();
 		});
 		retain();
-		r.db('rethinkdb').table('users').between('a', 'b').map(function(v) return 1).run(conn).asAtom().handle(function(o) {
+		r.db('rethinkdb').table('users').between('a', 'b').map(function(v) return 1).run(conn).asCursor().handle(function(o) {
 			$type(o.sure());
 			trace('2' + Type.getClassName(Type.getClass(o.sure())));
 			release();
