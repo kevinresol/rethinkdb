@@ -88,6 +88,9 @@ abstract Expr(Term) from Term to Term {
 	@:from
 	public static inline function ofBool(v:Bool):Expr
 		return TDatum(v);
+	@:from
+	public static inline function ofObject(v:{}):Expr
+		return TDatum(v);
 		
 	@:op(A+B)
 	public inline function opAdd(b:Expr):Expr
@@ -347,8 +350,16 @@ abstract Expr(Term) from Term to Term {
 		return TToEpochTime(this);
 	
 	// Control structures
-	public inline function do_(f:Expr):Expr
-		return TFuncall([f, this]);
+	public inline function do_(e1:Expr, ?e2:Expr, ?e3:Expr, ?e4:Expr, ?e5:Expr):Expr
+		return TFuncall({
+			var args = [this];
+			if(e1 != null) e2 == null ? args.unshift(e1) : args.push(e1);
+			if(e2 != null) e3 == null ? args.unshift(e2) : args.push(e2);
+			if(e3 != null) e4 == null ? args.unshift(e3) : args.push(e3);
+			if(e4 != null) e5 == null ? args.unshift(e4) : args.push(e4);
+			if(e5 != null) args.unshift(e5);
+			args;
+		});
 	public inline function branch(ifTrue:Expr, ifFalse:Expr):Expr
 		return TBranch([this, ifTrue, ifFalse]);
 	public inline function forEach(f:Expr->Expr):Expr

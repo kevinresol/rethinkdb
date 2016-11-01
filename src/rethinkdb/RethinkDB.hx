@@ -164,8 +164,15 @@ class RethinkDB {
 		return TArgs(v);
 	public inline function binary(v:Bytes):Expr
 		return TBinary([TDatum(v)]);
-	public inline function do_(f:Expr, ?a:Exprs):Expr
-		return TFuncall(a == null ? [f] : [f].concat(a));
+	public inline function do_(e1:Expr, ?e2:Expr, ?e3:Expr, ?e4:Expr, ?e5:Expr):Expr
+		return TFuncall({
+			var args = [e1];
+			if(e2 != null) e3 == null ? args.unshift(e2) : args.push(e2);
+			if(e3 != null) e4 == null ? args.unshift(e3) : args.push(e3);
+			if(e4 != null) e5 == null ? args.unshift(e4) : args.push(e4);
+			if(e5 != null) args.unshift(e5);
+			args;
+		});
 	public inline function branch(v:Expr, t:Expr, f:Expr):Expr
 		return TBranch([v, t, f]);
 	public inline function range(?start:Int, ?end:Int):Expr

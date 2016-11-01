@@ -21,8 +21,8 @@ abstract Table(Expr) from Term to Term to Expr {
 		return TIndexWait([]);
 	
 	// Writing data
-	public inline function insert(v:Array<Dynamic>):Expr
-		return TInsert(this.concat([for(i in v) TDatum(Datum.fromDynamic(i))]));
+	public inline function insert(v:InsertExpr):Expr
+		return TInsert([this, v]);
 	public inline function update(v:ObjectOrFunction):Expr
 		return TUpdate([this, v]);
 	public inline function replace(v:ObjectOrFunction):Expr
@@ -62,4 +62,14 @@ abstract Table(Expr) from Term to Term to Expr {
 			args;
 		});
 	
+}
+
+abstract InsertExpr(Expr) from Expr to Expr {
+	@:from
+	public static inline function fromArray(v:Array<Dynamic>):InsertExpr
+		return TMakeArray([for(i in v) TDatum(Datum.fromDynamic(i))]);
+	
+	@:from
+	public static inline function fromObject(v:{}):InsertExpr
+		return TDatum(v);
 }

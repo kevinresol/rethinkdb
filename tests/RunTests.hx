@@ -14,7 +14,7 @@ class RunTests {
 	static function main() {
 		var conn = r.connect();
 		
-		new Test();
+		new Test(); return;
 		
 		retain();
 		r.db('rethinkdb').table('users').map(function(v) return 1).run(conn).asCursor().handle(function(o) {
