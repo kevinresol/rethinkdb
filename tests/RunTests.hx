@@ -33,13 +33,13 @@ class RunTests {
 			// new geo.TestOperations(conn),
 			// new geo.TestPrimitives(conn),
 			// new TestMatch(conn),
-			// new math_logic.TestAdd(conn),
-			// new math_logic.TestAliases(conn),
+			new math_logic.TestAdd(conn),
+			new math_logic.TestAliases(conn),
 			// new math_logic.TestDiv(conn),
-			// new math_logic.TestFloor_ceil_round(conn),
-			// new math_logic.TestLogic(conn),
-			// new math_logic.TestMath(conn),
-			// new math_logic.TestMod(conn),
+			new math_logic.TestFloor_ceil_round(conn),
+			new math_logic.TestLogic(conn),
+			new math_logic.TestMath(conn),
+			new math_logic.TestMod(conn),
 			// new math_logic.TestSub(conn),
 			// new meta.TestDbs(conn),
 			// new meta.TestTable(conn),
@@ -112,10 +112,12 @@ class RunTests {
 		
 		Future.ofMany([for(test in tests) test.run()]).handle(function(outcomes) {
 			var errors = [];
+			var total = 0;
 			for(o in outcomes) switch o {
-				case Success(_):
+				case Success(n): total += n;
 				case Failure(e): errors = errors.concat(e);
 			}
+			trace('$total Tests : ${errors.length} Errors');
 			if(errors.length > 0) for(e in errors) trace(e);
 			Sys.exit(errors.length);
 		});

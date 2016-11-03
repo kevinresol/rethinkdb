@@ -10,9 +10,9 @@ class TestApi extends TestBase {
 		assertAtom((1375146296.681), (t1 - 1000).toEpochTime());
 		assertAtom(1000, (t1 - (t1 - 1000)));
 		assertAtom(true, t1.during(t1, t1 + 1000));
-		assertAtom(false, t1.during(t1, t1 + 1000, { left_bound : "open" }));
+		assertAtom(false, t1.during(t1, t1 + 1000, { "left_bound" : "open" }));
 		assertAtom(false, t1.during(t1, t1));
-		assertAtom(true, t1.during(t1, t1, { right_bound : "closed" }));
+		assertAtom(true, t1.during(t1, t1, { "right_bound" : "closed" }));
 		assertAtom(1375142400, t1.date().toEpochTime());
 		assertAtom((4896.681), t1.timeOfDay());
 		assertAtom(2013, t1.year());
@@ -38,7 +38,7 @@ class TestApi extends TestBase {
 		assertAtom(("PTYPE<TIME>"), r.now().typeOf());
 		assertAtom(0, (r.now() - r.now()));
 		assertError("ReqlQueryLogicError", "ISO 8601 string has no time zone, and no default time zone was provided.", r.iso8601("2013-07-30T20:56:05").toIso8601());
-		assertAtom(("2013-07-30T20:56:05-07:00"), r.iso8601("2013-07-30T20:56:05", { default_timezone : "-07" }).toIso8601());
+		assertAtom(("2013-07-30T20:56:05-07:00"), r.iso8601("2013-07-30T20:56:05", { "default_timezone" : "-07" }).toIso8601());
 		assertAtom(([1, 2, 3, 4, 5, 6, 7]), r.expr([r.monday, r.tuesday, r.wednesday, r.thursday, r.friday, r.saturday, r.sunday]));
 		assertAtom(([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]), r.expr([r.january, r.february, r.march, r.april, r.may, r.june, r.july, r.august, r.september, r.october, r.november, r.december]));
 	}

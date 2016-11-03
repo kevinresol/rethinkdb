@@ -18,15 +18,18 @@ class TestBase {
 	}
 	
 	var count:Int;
+	var total:Int;
 	var errors:Array<Error>;
-	var done:FutureTrigger<Outcome<Noise, Array<Error>>>;
+	var done:FutureTrigger<Outcome<Int, Array<Error>>>;
 	
-	function retain()
+	function retain() {
 		count++;
+		total++;
+	}
 		
 	function release()
 		if(--count == 0)
-			done.trigger(errors.length == 0 ? Success(Noise) : Failure(errors));
+			done.trigger(errors.length == 0 ? Success(total) : Failure(errors));
 	
 	function handle(s:Surprise<Noise, Error>) 
 		s.handle(function(o) {
@@ -76,9 +79,11 @@ class TestBase {
 	
 	public function run() {
 		count = 0;
+		total = 0;
 		errors = [];
 		done = Future.trigger();
 		test();
+		if(total == 0) done.trigger(Success(total));
 		return done.asFuture();
 	}
 	

@@ -188,7 +188,7 @@ class Parser extends hxparse.Parser<hxparse.LexerTokenSource<Token>, Token> impl
 						for(i in 0...args.length) switch args[i] {
 							case EBinop(OpAssign, EConst(CIdent(name)), e2):
 								if(index == -1) index = i;
-								fields.push({field: name, expr: e2});
+								fields.push({field: '"$name"', expr: e2});
 							default:
 								if(index != -1) throw 'Named arguments are suppose to be grouped at the end';
 						}

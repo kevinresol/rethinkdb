@@ -8,7 +8,7 @@ class Test1001 extends TestBase {
 		assertAtom(null, tbl.indexCreate("b"));
 		assertAtom(null, tbl.indexWait().pluck("index", "ready"));
 		assertAtom(1, tbl.between(r.minval, r.maxval).count());
-		assertAtom(0, tbl.between(r.minval, r.maxval, { index : "a" }).count());
-		assertAtom(0, tbl.between(r.minval, r.maxval, { index : "b" }).count());
+		assertAtom(0, tbl.between(r.minval, r.maxval, { "index" : "a" }).count());
+		assertAtom(0, tbl.between(r.minval, r.maxval, { "index" : "b" }).count());
 	}
 }
