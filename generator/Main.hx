@@ -6,13 +6,53 @@ import haxe.macro.Printer;
 import yaml.Yaml;
 import yaml.Parser;
 
+using haxe.io.Path;
 using sys.io.File;
+using sys.FileSystem;
 using StringTools;
 
 class Main {
+	
+	static var root = '../../rethinkdb/test/rql_test/src';
+	static var tests = [];
+	
 	static function main() {
-		var tests = Yaml.read("../../rethinkdb/test/rql_test/src/default.yaml", Parser.options().useObjects());
-		var name = 'TestTemp';
+		
+		handleDirectory('');
+		
+		var main = '../tests/RunTests.hx';
+		var src = main.getContent().split('\n');
+		var s = -1, e = -1;
+		for(i in 0...src.length) {
+			var line = src[i];
+			if(line.indexOf('// >>>>') != -1) s = i;
+			if(line.indexOf('// <<<<') != -1) e = i;
+			if(s != -1 && e != -1) break;
+		}
+		
+		src.splice(s + 1, e - s - 1);
+		for(i in 0...tests.length) {
+			src.insert(s + i + 1, '\t\t\tnew ' + tests[i] + '(conn),');
+		}
+		main.saveContent(src.join('\n'));
+	}
+		
+	static function handleDirectory(path:String) {
+		for(p in ('$root/$path').readDirectory()) {
+			if('$root/$path/$p'.isDirectory()) handleDirectory('$path/$p');
+			else if(p.indexOf('.') != p.lastIndexOf('.')) continue;
+			else try handleFile('$path/$p') catch(e:Dynamic) {
+				trace(e);
+			}
+		}
+	}
+	
+	static function handleFile(path:String) {
+		trace('handling $path');
+		var tests = Yaml.read('$root/$path', Parser.options().useObjects());
+		var pack = path.substr(1).directory();
+		var filename = path.withoutDirectory().withoutExtension();
+		var name = 'Test' + filename.substr(0, 1).toUpperCase() + filename.substr(1);
 		var exprs = [];
 		
 		var printer = parser.Parser.Printer;
@@ -43,7 +83,7 @@ class Main {
 					exprs.push(assert);
 					
 				} catch(e:Dynamic) {
-					// trace(e);
+					trace(e);
 					// continue
 				}
 			}
@@ -69,10 +109,15 @@ class Main {
 		}
 		
 		var src = [
+			'package ' + pack.replace('/', '.') + ';',
 			'import rethinkdb.RethinkDB.r;',
 			'import rethinkdb.reql.*;',
 			new haxe.macro.Printer().printTypeDefinition(cl)
 		];
-		'../tests/$name.hx'.saveContent(src.join('\n'));
+		
+		var folder = '../tests/$pack/';
+		if(!folder.exists()) folder.createDirectory();
+		'$folder/$name.hx'.saveContent(src.join('\n'));
+		Main.tests.push('$folder/$name'.normalize().substr(9).replace('/', '.'));
 	}
 }

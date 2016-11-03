@@ -4,6 +4,7 @@ import haxe.io.Bytes;
 import rethinkdb.reql.Expr;
 import rethinkdb.reql.Db;
 import rethinkdb.reql.Table;
+import rethinkdb.reql.Options;
 import tink.protocol.rethinkdb.Term;
 import tink.protocol.rethinkdb.Datum;
 
@@ -192,16 +193,16 @@ class RethinkDB {
 		return TError(v == null ? [] : [v]);
 	public inline function expr(v:Dynamic):Expr
 		return Std.is(v, Term) ? v : TDatum(DatumTools.ofAny(v));
-	public inline function js(v:Expr):Expr
-		return TJavascript([v]);
+	public inline function js(v:Expr, ?opt:Options):Expr
+		return TJavascript([v], opt);
 	public inline function typeOf(v:Expr):Expr
 		return TTypeOf([v]);
 	public inline function info(v:Expr):Expr
 		return TInfo([v]);
 	public inline function json(v:Expr):Expr
 		return TJson([v]);
-	public inline function http(v:Expr):Expr
-		return THttp([v]);
+	public inline function http(v:Expr, ?opt:Options):Expr
+		return THttp([v], opt);
 	public inline function uuid(?v:Expr):Expr
 		return TUuid(v == null ? [] : [v]);
 	
