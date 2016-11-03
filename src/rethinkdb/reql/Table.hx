@@ -7,13 +7,13 @@ import tink.protocol.rethinkdb.Datum;
 @:forward
 abstract Table(Expr) from Term to Term to Expr {
 	
-	public inline function indexCreate(name:String):Expr
-		return TIndexCreate(name);
-	public inline function indexDrop(name:String):Expr
-		return TIndexDrop(name);
+	public inline function indexCreate(name:Expr):Expr
+		return TIndexCreate([name]);
+	public inline function indexDrop(name:Expr):Expr
+		return TIndexDrop([name]);
 	public inline function indexList():Expr
 		return TIndexDrop([]);
-	public inline function indexRename(oldName:String, newName:String):Expr
+	public inline function indexRename(oldName:Expr, newName:Expr):Expr
 		return TIndexRename([oldName, newName]);
 	public inline function indexStatus():Expr
 		return TIndexStatus([]);
@@ -21,21 +21,28 @@ abstract Table(Expr) from Term to Term to Expr {
 		return TIndexWait([]);
 	
 	// Writing data
-	public inline function insert(v:InsertExpr):Expr
+	public inline function insert(v:Expr):Expr
 		return TInsert([this, v]);
-	public inline function update(v:ObjectOrFunction):Expr
+	public inline function update(v:Expr):Expr
 		return TUpdate([this, v]);
-	public inline function replace(v:ObjectOrFunction):Expr
+	public inline function replace(v:Expr):Expr
 		return TReplace([this, v]);
 	public inline function delete():Expr
-		return TDelete(this);
+		return TDelete([this]);
 	public inline function sync():Expr
-		return TSync(this);
+		return TSync([this]);
 	
-	public inline function get(id:String):Expr
-		return TGet([this, TDatum(id)]);
-	public inline function getAll(ids:Array<String>):Expr
-		return TGet(this.concat([for(id in ids) TDatum(id)]));
+	public inline function get(id:Expr):Expr
+		return TGet([this, id]);
+	public inline function getAll(v1:Expr, ?v2:Expr, ?v3:Expr, ?v4:Expr, ?v5:Expr):Expr
+		return TGetAll({
+			var args = [this, v1];
+			if(v2 != null) args.push(v2);
+			if(v3 != null) args.push(v3);
+			if(v4 != null) args.push(v4);
+			if(v5 != null) args.push(v5);
+			args;
+		});
 	public inline function between(lower:Expr, upper:Expr):Expr
 		return TBetween([this, lower, upper]);
 		
@@ -48,13 +55,13 @@ abstract Table(Expr) from Term to Term to Expr {
 	public inline function grant(v:Expr, opt:Expr):Expr
 		return TGrant([this, v, opt]);
 	public inline function config():Expr
-		return TConfig(this);
+		return TConfig([this]);
 	public inline function rebalance():Expr
-		return TRebalance(this);
+		return TRebalance([this]);
 	public inline function reconfigure(v:Expr):Expr
 		return TReconfigure([this, v]);
 	public inline function status():Expr
-		return TStatus(this);
+		return TStatus([this]);
 	public inline function wait(?opt:Expr):Expr
 		return TWait({
 			var args = [this];
@@ -67,9 +74,9 @@ abstract Table(Expr) from Term to Term to Expr {
 abstract InsertExpr(Expr) from Expr to Expr {
 	@:from
 	public static inline function fromArray(v:Array<Dynamic>):InsertExpr
-		return TMakeArray([for(i in v) TDatum(Datum.fromDynamic(i))]);
+		return TMakeArray([for(i in v) TDatum(DatumTools.ofAny(i))]);
 	
 	@:from
 	public static inline function fromObject(v:{}):InsertExpr
-		return TDatum(v);
+		return TDatum(DatumTools.ofAny(v));
 }

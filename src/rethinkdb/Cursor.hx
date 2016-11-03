@@ -3,7 +3,7 @@ package rethinkdb;
 import tink.streams.Stream;
 import tink.streams.StreamStep;
 import tink.protocol.rethinkdb.Query;
-import tink.protocol.rethinkdb.Response;
+import rethinkdb.response.Response;
 
 using tink.CoreApi;
 
@@ -32,7 +32,7 @@ class Cursor<T> extends Generator<T> {
 			} else if(!firstResponse.isFeed()) {
 				cb(End);
 			} else if(nextResponse == null) {
-				nextResponse = connection.query(QContinue(firstResponse.token)) >> function(r:rethinkdb.Response) return r.response;
+				nextResponse = connection.query(new Query(QContinue(firstResponse.token)));
 				nextResponse.handle(function(o) switch o {
 					case Success(res): addResponse(res); nextResponse = null; next();
 					case Failure(f): trace('fail');

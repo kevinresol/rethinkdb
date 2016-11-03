@@ -7,22 +7,22 @@ import tink.protocol.rethinkdb.Term;
 abstract Db(Expr) from Expr to Expr {
 	public inline function run(conn:Connection)
 		return this.run(conn);
-	public inline function tableCreate(name:String):Expr
-		return TTableCreate(name);
-	public inline function tableDrop(name:String):Expr
-		return TTableDrop(name);
+	public inline function tableCreate(name:Expr):Expr
+		return TTableCreate([name]);
+	public inline function tableDrop(name:Expr):Expr
+		return TTableDrop([name]);
 	public inline function tableList():Expr
 		return TTableDrop([]);
-	public inline function table(name:String):Table
-		return TTable([this, TDatum(name)]);
+	public inline function table(name:Expr):Table
+		return TTable([this, name]);
 		
 	// Administration
 	public inline function grant(v:Expr, opt:Expr):Expr
 		return TGrant([this, v, opt]);
 	public inline function config():Expr
-		return TConfig(this);
+		return TConfig([this]);
 	public inline function rebalance():Expr
-		return TRebalance(this);
+		return TRebalance([this]);
 	public inline function reconfigure(v:Expr):Expr
 		return TReconfigure([this, v]);
 	public inline function wait(?opt:Expr):Expr

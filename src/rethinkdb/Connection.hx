@@ -3,13 +3,13 @@ package rethinkdb;
 import haxe.io.Bytes;
 import tink.tcp.Connection as TcpConnection;
 import tink.protocol.rethinkdb.Client;
-import tink.protocol.rethinkdb.Query;
 // import tink.protocol.rethinkdb.RawResponse;
 import tink.protocol.rethinkdb.Response as ProtocolResponse;
 import tink.streams.Accumulator;
 import tink.streams.Stream;
 
-using rethinkdb.Response;
+using tink.protocol.rethinkdb.Query;
+using rethinkdb.response.Response;
 using tink.CoreApi;
 
 class Connection {
@@ -46,7 +46,7 @@ class Connection {
 	}
 	
 	public function server() {
-		return query(QServerInfo).asAtom();
+		return query(new Query(QServerInfo)).asAtom();
 	}
 	
 	public function query(query:Query):Surprise<Response, Error> {
@@ -54,8 +54,8 @@ class Connection {
 			var link:CallbackLink = null;
 			link = received.handle(function(res) {
 				if(res.token == query.token) {
-					res.convert({rawTime: false, rawBinary: false, rawGroups: false});
-					cb(Success(new Response(res, this, query)));
+					// res.convert({rawTime: false, rawBinary: false, rawGroups: false});
+					cb(Response.parse(res, this, query));
 					link.dissolve();
 				}
 			});
