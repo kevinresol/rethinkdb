@@ -80,9 +80,6 @@ abstract Expr(Term) from Term to Term {
 	}
 	
 	@:from
-	public static function ofBools(v:Array<Bool>):Expr
-		return TMakeArray([for(i in v) TDatum(DBool(i))]);
-	@:from
 	public static inline function ofString(v:String):Expr
 		return TDatum(DString(v));
 	@:from
@@ -136,10 +133,6 @@ abstract Expr(Term) from Term to Term {
 	public inline function opGetField(v:String)
 		return getField(v);
 		
-	@:to
-	public inline function toTerm():Term
-		return this;
-	
 	// Accessing ReQL
 	public inline function changes():Expr
 		return TChanges([this]);
