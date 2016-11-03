@@ -1,118 +1,102 @@
 package ;
 
+import deepequal.DeepEqual.*;
 import rethinkdb.RethinkDB.r;
+import rethinkdb.*;
+import rethinkdb.reql.*;
+import rethinkdb.response.*;
 
 using RethinkDBApi;
 using tink.CoreApi;
 
 class RunTests {
 
-	static var count = 0;
-	static function retain() count ++;
-	static function release() {}; //if(--count == 0) travix.Logger.exit(0);
+	var conn:Connection;
+	var tbl:Expr;
 	
-	static function main() {
-		var conn = r.connect();
-		
-		new Test(); return;
-		
-		retain();
-		r.db('rethinkdb').table('users').map(function(v) return 1).run(conn).asCursor().handle(function(o) {
-			$type(o.sure());
-			trace('1' + Type.getClassName(Type.getClass(o.sure())));
-			release();
-		});
-		retain();
-		r.db('rethinkdb').table('users').between('a', 'b').map(function(v) return 1).run(conn).asCursor().handle(function(o) {
-			$type(o.sure());
-			trace('2' + Type.getClassName(Type.getClass(o.sure())));
-			release();
-		});
-		retain();
-		r.db('rethinkdb').table('users').get('admin').run(conn).asAtom().handle(function(o) {
-			$type(o.sure());
-			trace('3' + o.sure());
-			release();
-		});
-		
-		// retain();
-		// r.expr(1).map(function(v) return v > 2).run(conn).handle(function(o) {
-		// 	$type(o.sure());
-		// 	trace('4' + Type.getClassName(Type.getClass(o.sure())));
-		// 	release();
-		// });
-		return;
-		
-		// retain();
-		// r.db('rethinkdb').table('users').get('admin').map(function(_) return 1).run(conn).handle(function(o) {
-		// 	var cursor = o.sure();
-		// 	release();
-		// });
- 
-		
-		// retain();
-		// r.expr([1,2,3]).map(function(v) return v == v).run(conn).handle(function(o) {
-		// 	var res = o.sure().asAtom();
-		// 	trace(res);
-		// 	release();
-		// });
-		
-		// retain();
-		// r.table('users').map(function(user) return user['age']).reduce(function(x, y) return x + y).run(conn).handle(function(o) {
-		// 	var res = o.sure().asAtom();
-		// 	trace(res);
-		// 	release();
-		// });
-		
-		// retain();
-		// r.table('users').map(function(user) return user['age']).run(conn).handle(function(o) {
-		// 	var cursor:Cursor<Int> = o.sure();
-			
-		// 	cursor.forEach(function(i) return true).handle(function(_) {
-		// 		release();
-		// 	});
-		// });
-		
-		// retain();
-		// r.uuid().run(conn).handle(function(o) {
-		// 	trace(o.sure());
-		// 	release();
-		// });
-		
-		// retain();
-		// r.do_(function(a:Expr, b:Expr, c:Expr) return a + b + c, [1,2,3]).run(conn).handle(function(o) {
-		// 	trace(o.sure());
-		// 	release();
-		// });
-		
-		// retain();
-		// r.expr(100).do_(function(a:Expr) return a * a).run(conn).handle(function(o) {
-		// 	trace(o.sure());
-		// 	release();
-		// });
-		
-		// retain();
-		// r.table('users').changes().run(conn).handle(function(o) {
-		// 	var cursor:Cursor<Dynamic> = o.sure();
-		// 	var n = 0;
-		// 	cursor.forEach(function(o) {
-		// 		trace(o);
-		// 		if(n++ > 3) {
-		// 			release();
-		// 			return false;
-		// 		}
-		// 		return true;
-		// 	});
-		// });
-		// r.table('users').insert([{age:1234}]).run(conn).handle(function(o) {
-		// 	var res:{generated_keys:Array<String>} = o.sure().asAtom();
-		// 	var key = res.generated_keys[0];
-		// 	var n = 90;
-		// 	for(i in 0...5) {
-		// 		haxe.Timer.delay(function() r.table('users').get(key).update({age:n+i}).run(conn), i * 0);
-		// 	}
-		// });
-		
+	static function main()
+		new RunTests();
+	
+	public function new() {
+		conn = r.connect();
+		test();
 	}
+	
+	var count = 0;
+	var errors = [];
+	
+	function retain()
+		count++;
+		
+	function release()
+		if(--count == 0) {
+			if(errors.length > 0) for(e in errors) trace(e);
+			Sys.exit(errors.length);
+		}
+	
+	function handle(s:Surprise<Noise, Error>) 
+		s.handle(function(o) {
+			switch o {
+				case Success(_):
+				case Failure(f): errors.push(f);
+			}
+			release();
+		});
+	
+	function assertAtom<T>(v:T, e:Expr, ?pos:haxe.PosInfos) {
+		retain();
+		
+		var f = e.run(conn).asAtom().map(function(o) return switch o {
+			case Success(ret): try {
+				compare(ret, v);
+				Success(Noise); 
+			}catch(err:String) Failure(new Error(err, pos));
+			case Failure(f): Failure(new Error('Unexpected error $f', pos));
+		});
+		
+		handle(f);
+	}
+	
+	function assertError(errName:String, message:String, e:Expr, ?pos:haxe.PosInfos) {
+		retain();
+		
+		var f = e.run(conn).asAtom().map(function(o) return switch o {
+			case Success(_): Failure(new Error("Unexpected failure", pos));
+			case Failure(f): try {
+				var err:ReqlError = f.data;
+				compare(errName, err.getName());
+				compare(message, (err.getParameters()[0]:String).split('\n')[0]);
+				Success(Noise);
+			} catch(err:String) Failure(new Error(err, pos));
+		});
+		
+		handle(f);
+	}
+	
+	function test() {
+		assertAtom(1, r.expr(1).default_(2));
+		assertAtom(2, r.expr(null).default_(2));
+		assertAtom([0, 1, 2, 3], r.expr([0, 1, 2]).do_(function(e:Expr) return e.append(3)));
+		assertAtom(3, r.do_(1, 2, function(x:Expr, y:Expr) return x + y));
+		assertAtom(1, r.do_(1));
+		assertError('ReqlQueryLogicError', 'Expected function with 2 arguments but found function with 1 argument.', r.do_(1, 2, function(x:Expr) return x));
+		assertError('ReqlQueryLogicError', 'Expected function with 3 arguments but found function with 2 arguments.', r.do_(1, 2, 3, function(x:Expr, y:Expr) return x + y));
+		assertError('ReqlQueryLogicError', 'Expected type ARRAY but found STRING.', r.expr('abc').do_(function(v:Expr) return v.append(3)));
+		assertError('ReqlQueryLogicError', 'Expected type STRING but found NUMBER.', r.expr('abc').do_(function(v:Expr) return v + 3));
+		assertError('ReqlQueryLogicError', 'Expected type STRING but found NUMBER.', r.expr('abc').do_(function(v:Expr) return v.add('def')).add(3));
+		assertError('ReqlQueryLogicError', 'Expected function with 1 argument but found function with 2 arguments.', r.expr(0).do_(function(a:Expr, b:Expr) return a + b).add(3));
+		
+		
+		assertAtom(1, r.branch(true, 1, 2));
+		assertAtom(2, r.branch(false, 1, 2));
+		assertAtom('c', r.branch(1, 'c', false));
+		assertAtom([], r.branch(null, {}, []));
+		assertError('ReqlQueryLogicError', 'Expected type DATUM but found DATABASE:', r.branch(r.db('test'), 1, 2));
+		
+		var tbl = r.table('tink_protocol');
+		
+		// tbl.insert([for(i in 0...3) {id:i, a:i}]).run(conn).asAtom().assertAtom({deleted: 0,replaced: 0,unchanged: 0,errors: 0,skipped: 0,inserted: 3});
+	}
+
   
 }

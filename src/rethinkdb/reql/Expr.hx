@@ -29,16 +29,16 @@ abstract Exprs(Array<Expr>) from Array<Expr> to Array<Expr> from Array<Term> to 
 		return ofSingle(v);
 	@:from
 	public static inline function ofInts(v:Array<Int>):Exprs
-		return [for(i in v) TDatum(DNumber(i))];
+		return [for(i in v) (i:Expr)];
 	@:from
 	public static inline function ofFloats(v:Array<Float>):Exprs
-		return [for(i in v) TDatum(DNumber(i))];
+		return [for(i in v) (i:Expr)];
 	@:from
 	public static inline function ofStrings(v:Array<String>):Exprs
-		return [for(i in v) TDatum(DString(i))];
+		return [for(i in v) (i:Expr)];
 	@:from
 	public static inline function ofBools(v:Array<Bool>):Exprs
-		return [for(i in v) TDatum(DBool(i))];
+		return [for(i in v) (i:Expr)];
 }
 
 @:forward
@@ -53,6 +53,10 @@ abstract Expr(Term) from Term to Term {
 		var query = new Query(QStart(this));
 		return connection.query(query);
 	}
+	
+	@:from
+	public static inline function ofFunc0(f:Void->Expr):Expr
+		return f();
 	
 	@:from
 	public static function ofFunc1(f:Expr->Expr):Expr {
