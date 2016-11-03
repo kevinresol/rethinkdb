@@ -22,30 +22,46 @@ class Main {
 			// if(exprs.length > 3) break;
 			var str:String = test.py == null ? test.cd : test.py;
 			var out:String = Std.string(test.ot);
-			trace(str, out);
-			if(str == null) continue;
-			
-			try {
-				
-				var parser = new parser.Parser(byte.ByteData.ofString(str), 'test');
-				var expr = parser.parse();
-				var parsed = printer.print(expr);
-				var action = mapper.map(expr);
-				
-				var parser = new parser.Parser(byte.ByteData.ofString(out), 'test');
-				var expr = parser.parse();
-				var parsed = printer.print(expr);
-				var assert = switch mapper.map(expr) {
-					case {expr:ECall({expr: EConst(CIdent('err'))}, p)}: macro assertError(${p[0]}, ${p[1]}, $action);
-					case e: macro assertAtom($e, $action);
+			var def:String = test.def;
+			// trace(str, out);
+			if(str != null) {
+				try {
+					
+					var parser = new parser.Parser(byte.ByteData.ofString(str), 'test');
+					var expr = parser.parse();
+					var parsed = printer.print(expr);
+					var action = mapper.map(expr);
+					
+					var parser = new parser.Parser(byte.ByteData.ofString(out), 'test');
+					var expr = parser.parse();
+					var parsed = printer.print(expr);
+					var assert = switch mapper.map(expr) {
+						case {expr:ECall({expr: EConst(CIdent('err'))}, p)}: macro assertError(${p[0]}, ${p[1]}, $action);
+						case e: macro assertAtom($e, $action);
+					}
+					
+					exprs.push(assert);
+					
+				} catch(e:Dynamic) {
+					// trace(e);
+					// continue
 				}
-				
-				exprs.push(assert);
-				
-			} catch(e:Dynamic) {
-				trace(e);
-				// continue
 			}
+			if(def != null) {
+				var parser = new parser.Parser(byte.ByteData.ofString(def), 'test');
+				var expr = parser.parse();
+				var parsed = printer.print(expr);
+				var defExpr = switch mapper.map(expr).expr {
+					case EBinop(OpAssign, {expr: EConst(CIdent(name))}, expr): EVars([{
+						expr: expr,
+						name: name,
+						type: null,
+					}]);
+					default: throw 'unhandled def: $def';
+				}
+				exprs.push({expr: defExpr, pos: null});
+			}
+			
 		}
 		
 		var cl = macro class $name extends TestBase {

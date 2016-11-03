@@ -30,6 +30,7 @@ enum Binop {
 	OpDiv;
 	OpMul;
 	OpMod;
+	OpAssign;
 }
 
 enum Expr {
@@ -68,6 +69,7 @@ class Lexer extends hxparse.Lexer implements hxparse.RuleBuilder {
 		"\\*" => TBinop(OpMul),
 		"\\/" => TBinop(OpDiv),
 		"\\%" => TBinop(OpMod),
+		"\\=" => TBinop(OpAssign),
 		"," => TComma,
 		";" => TSemicolon,
 		":" => TColon,
@@ -297,10 +299,12 @@ class Printer {
 			case OpDiv: ' * ';
 			case OpMul: ' / ';
 			case OpMod: ' % ';
+			case OpAssign: ' = ';
 		}
 }
 
 class Mapper {
+	static var underscoreRegex = ~/_(\w)/gi;
 	public static function map(e:Expr):haxe.macro.Expr {
 		var def = switch e {
 			case EConst(c): ExprDef.EConst(switch c {
@@ -310,9 +314,21 @@ class Mapper {
 				case CString(v): CString(v);
 			});
 			case EField(e, field):
-				switch field {
-					case 'default' | 'do': field = field + '_';
+				field = switch field {
+					case 'default' | 'do':
+						// escape keywords
+						field + '_';
 					default:
+						// convert snake_case to camelCase
+						var f = field;
+						var buf = new StringBuf();
+						while (underscoreRegex.match(f)) {
+							buf.add(underscoreRegex.matchedLeft());
+							buf.add(underscoreRegex.matched(1).toUpperCase());
+							f = underscoreRegex.matchedRight();
+						}
+						buf.add(f);
+						buf.toString();
 				} 
 				ExprDef.EField(map(e), field);
 			case ECall(e, args): ExprDef.ECall(map(e), args.map(map));
@@ -322,6 +338,7 @@ class Mapper {
 				case OpDiv: OpDiv;
 				case OpMul: OpMult;
 				case OpMod: OpMod;
+				case OpAssign: OpAssign;
 			}, map(e1), map(e2));
 			case ELambda(args, e): ExprDef.EFunction(null, {
 					args: args.map(function(a) return {name: a, meta: null, opt: null, type: null, value: null}),
