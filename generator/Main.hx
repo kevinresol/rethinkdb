@@ -41,6 +41,7 @@ class Main {
 		for(p in ('$root/$path').readDirectory()) {
 			if('$root/$path/$p'.isDirectory()) handleDirectory('$path/$p');
 			else if(p.indexOf('.') != p.lastIndexOf('.')) continue;
+			// else if(p != 'add.yaml') continue;
 			else try handleFile('$path/$p') catch(e:Dynamic) {
 				trace(e);
 			}

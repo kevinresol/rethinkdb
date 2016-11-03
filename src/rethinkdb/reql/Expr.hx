@@ -83,7 +83,12 @@ abstract Expr(Term) from Term to Term {
 		return TFunc([TMakeArray(argNums), f(var1, var2, var3)]);
 	}
 	
+	@:from public static inline function ofStrings(v:Array<String>):Expr return TMakeArray([for(i in v) (i:Expr)]);
+	@:from public static inline function ofInts(v:Array<Int>):Expr return TMakeArray([for(i in v) (i:Expr)]);
+	@:from public static inline function ofFloats(v:Array<Float>):Expr return TMakeArray([for(i in v) (i:Expr)]);
+	@:from public static inline function ofBools(v:Array<Bool>):Expr return TMakeArray([for(i in v) (i:Expr)]);
 	@:from public static inline function ofString(v:String):Expr return TDatum(DString(v));
+	@:from public static inline function ofInt(v:Int):Expr return TDatum(DNumber(v));
 	@:from public static inline function ofFloat(v:Float):Expr return TDatum(DNumber(v));
 	@:from public static inline function ofBool(v:Bool):Expr return TDatum(DBool(v));
 	@:from public static inline function ofObject(v:{}):Expr return TDatum(DatumTools.ofAny(v));

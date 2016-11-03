@@ -41,10 +41,14 @@ class TestBase {
 		retain();
 		
 		var f = e.run(conn).asAtom().map(function(o) return switch o {
-			case Success(ret): try {
-				compare(ret, v);
-				Success(Noise); 
-			} catch(err:String) Failure(new Error(err, pos));
+			case Success(ret):
+				try {
+					compare(ret, v);
+					Success(Noise); 
+				} catch(err:String) {
+					trace('Expected $v, got $ret');
+					Failure(new Error(err, pos));
+				}
 			case Failure(f): Failure(new Error('Unexpected error $f', pos));
 		});
 		

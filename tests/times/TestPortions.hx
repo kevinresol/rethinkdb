@@ -19,6 +19,6 @@ class TestPortions extends TestBase {
 		assertAtom(([[2013, 7, 30, 1, 21, 36.681], [2013, 7, 30, 1, 21, 36.682], [2013, 7, 30, 1, 21, 37.681], [2045, 4, 7, 3, 8, 16.681]]), ts.map(function(x) return [x.year(), x.month(), x.day(), x.hours(), x.minutes(), x.seconds()]));
 		assertAtom(rts, ts.map(function(x) return r.time(x.year(), x.month(), x.day(), x.hours(), x.minutes(), x.seconds(), x.timezone())).map(function(x) return x.toEpochTime()));
 		assertAtom(0, ts.map(function(x) return r.time(x.year(), x.month(), x.day(), x.hours(), x.minutes(), x.seconds(), x.timezone())).union(ts).map(function(x) return x.toIso8601()).distinct().count().sub(ts.count()));
-		assertAtom([[2], [2], [2], [5]], ts.map([r.row.dayOfWeek(), r.row.dayOfYear()]));
+		assertAtom([[2, 211], [2, 211], [2, 211], [5, 97]], ts.map([r.row.dayOfWeek(), r.row.dayOfYear()]));
 	}
 }

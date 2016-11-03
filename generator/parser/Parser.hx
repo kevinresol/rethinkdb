@@ -49,8 +49,8 @@ enum Expr {
 
 enum Const {
 	CIdent(v:String);
-	CInt(v:Int);
-	CFloat(v:Float);
+	CInt(v:String);
+	CFloat(v:String);
 	CString(v:String);
 }
 
@@ -75,7 +75,7 @@ class Lexer extends hxparse.Lexer implements hxparse.RuleBuilder {
 		":" => TColon,
 		"\\." => TDot,
 		"lambda" => TLambda,
-		"-?(([1-9][0-9]*)|0)(.[0-9]+)?([eE][\\+\\-]?[0-9]?)?" => TNumber(lexer.current),
+		"-?(([1-9][0-9]*)|0)(\\.[0-9]+)?([eE][\\+\\-]?[0-9]?)?" => TNumber(lexer.current),
 		'"' => {
 			buf = new StringBuf();
 			lexer.token(string);
@@ -154,7 +154,7 @@ class Parser extends hxparse.Parser<hxparse.LexerTokenSource<Token>, Token> impl
 		return switch stream {
 			case [TString(v)]: next(EConst(CString(v)));
 			case [TIdent(i)]: next(EConst(CIdent(i)));
-			case [TNumber(i)]: next(EConst(CFloat(Std.parseFloat(i))));
+			case [TNumber(i)]: next(EConst(CFloat(i)));
 			case [TBkOpen, a = params(), TBkClose]: next(EArrayDecl(a));
 			case [TBrOpen, e = block(), TBrClose]:
 				switch e {
@@ -301,8 +301,7 @@ class Printer {
 	
 	static function const(c:Const) 
 		return switch c {
-			case CIdent(v): v;
-			case CFloat(v) | CInt(v): '$v';
+			case CFloat(v) | CInt(v) | CIdent(v): v;
 			case CString(v): '"$v"';
 		}
 		
@@ -323,8 +322,8 @@ class Mapper {
 		var def = switch e {
 			case EConst(c): ExprDef.EConst(switch c {
 				case CIdent(v): CIdent(v);
-				case CFloat(v): CFloat(Std.string(v));
-				case CInt(v): CInt(Std.string(v));
+				case CFloat(v): CFloat(v);
+				case CInt(v): CInt(v);
 				case CString(v): CString(v);
 			});
 			case EField(e, field):
