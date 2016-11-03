@@ -18,6 +18,8 @@ class Main {
 	
 	static function main() {
 		
+		var start = haxe.Timer.stamp();
+		
 		handleDirectory('');
 		
 		var main = '../tests/RunTests.hx';
@@ -35,6 +37,9 @@ class Main {
 			src.insert(s + i + 1, '\t\t\tnew ' + tests[i] + '(conn),');
 		}
 		main.saveContent(src.join('\n'));
+		
+		var t = Std.int((haxe.Timer.stamp() - start) * 1000) / 1000;
+		trace('Generated ${tests.length} tests in ${t}s');
 	}
 		
 	static function handleDirectory(path:String) {
@@ -50,7 +55,8 @@ class Main {
 	
 	static function handleFile(path:String) {
 		trace('handling $path');
-		var tests = Yaml.read('$root/$path', Parser.options().useObjects());
+		var yaml = '$root/$path'.getContent();
+		var tests = Yaml.parse(yaml, Parser.options().useObjects());
 		var pack = path.substr(1).directory();
 		var filename = path.withoutDirectory().withoutExtension();
 		var name = 'Test' + filename.substr(0, 1).toUpperCase() + filename.substr(1);
