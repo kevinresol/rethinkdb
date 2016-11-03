@@ -188,10 +188,10 @@ class RethinkDB {
 			if(end != null) args.push(end);
 			args;
 		});
-	public inline function error(v:Expr):Expr
-		return TError([v]);
+	public inline function error(?v:Expr):Expr
+		return TError(v == null ? [] : [v]);
 	public inline function expr(v:Dynamic):Expr
-		return TDatum(DatumTools.ofAny(v));
+		return Std.is(v, Term) ? v : TDatum(DatumTools.ofAny(v));
 	public inline function js(v:Expr):Expr
 		return TJavascript([v]);
 	public inline function typeOf(v:Expr):Expr

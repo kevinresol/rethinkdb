@@ -83,59 +83,39 @@ abstract Expr(Term) from Term to Term {
 		return TFunc([TMakeArray(argNums), f(var1, var2, var3)]);
 	}
 	
-	@:from
-	public static inline function ofString(v:String):Expr
-		return TDatum(DString(v));
-	@:from
-	public static inline function ofFloat(v:Float):Expr
-		return TDatum(DNumber(v));
-	@:from
-	public static inline function ofBool(v:Bool):Expr
-		return TDatum(DBool(v));
-	@:from
-	public static inline function ofObject(v:{}):Expr
-		return TDatum(DatumTools.ofAny(v));
+	@:from public static inline function ofString(v:String):Expr return TDatum(DString(v));
+	@:from public static inline function ofFloat(v:Float):Expr return TDatum(DNumber(v));
+	@:from public static inline function ofBool(v:Bool):Expr return TDatum(DBool(v));
+	@:from public static inline function ofObject(v:{}):Expr return TDatum(DatumTools.ofAny(v));
 		
-	@:op(A+B)
-	public inline function opAdd(b:Expr):Expr
-		return add(b);
-	@:op(A-B)
-	public inline function opSub(b:Expr):Expr
-		return sub(b);
-	@:op(A*B)
-	public inline function opMul(b:Expr):Expr
-		return mul(b);
-	@:op(A/B)
-	public inline function opDiv(b:Expr):Expr
-		return div(b);
-	@:op(A%B)
-	public inline function opMod(b:Expr):Expr
-		return mod(b);
-	@:op(A==B)
-	public inline function opEq(b:Expr):Expr
-		return eq(b);
-	@:op(A!=B)
-	public inline function opNe(b:Expr):Expr
-		return ne(b);
-	@:op(A>B)
-	public inline function opGt(b:Expr):Expr
-		return gt(b);
-	@:op(A>=B)
-	public inline function opGe(b:Expr):Expr
-		return ge(b);
-	@:op(A<B)
-	public inline function opLt(b:Expr):Expr
-		return lt(b);
-	@:op(A<=B)
-	public inline function opLe(b:Expr):Expr
-		return le(b);
-	@:op(!A)
-	public inline function opNot():Expr
-		return not();
+	@:op(A+B) public inline function opAdd(b:Expr):Expr return add(b);
+	@:op(A-B) public inline function opSub(b:Expr):Expr return sub(b);
+	@:op(A*B) public inline function opMul(b:Expr):Expr return mul(b);
+	@:op(A/B) public inline function opDiv(b:Expr):Expr return div(b);
+	@:op(A%B) public inline function opMod(b:Expr):Expr return mod(b);
+	@:op(A==B) public inline function opEq(b:Expr):Expr return eq(b);
+	@:op(A!=B) public inline function opNe(b:Expr):Expr return ne(b);
+	@:op(A>B) public inline function opGt(b:Expr):Expr return gt(b);
+	@:op(A>=B) public inline function opGe(b:Expr):Expr return ge(b);
+	@:op(A<B) public inline function opLt(b:Expr):Expr return lt(b);
+	@:op(A<=B) public inline function opLe(b:Expr):Expr return le(b);
+	@:op(!A) public inline function opNot():Expr return not();
+	
+	@:op(A+B) public static inline function floatBinopAdd(a:Float, b:Expr):Expr return (a:Expr).add(b);
+	@:op(A-B) public static inline function floatBinopSub(a:Float, b:Expr):Expr return (a:Expr).sub(b);
+	@:op(A*B) public static inline function floatBinopMul(a:Float, b:Expr):Expr return (a:Expr).mul(b);
+	@:op(A/B) public static inline function floatBinopDiv(a:Float, b:Expr):Expr return (a:Expr).div(b);
+	@:op(A%B) public static inline function floatBinopMod(a:Float, b:Expr):Expr return (a:Expr).mod(b);
+	@:op(A==B) public static inline function floatBinopEq(a:Float, b:Expr):Expr return (a:Expr).eq(b);
+	@:op(A!=B) public static inline function floatBinopNe(a:Float, b:Expr):Expr return (a:Expr).ne(b);
+	@:op(A>B) public static inline function floatBinopGt(a:Float, b:Expr):Expr return (a:Expr).gt(b);
+	@:op(A>=B) public static inline function floatBinopGe(a:Float, b:Expr):Expr return (a:Expr).ge(b);
+	@:op(A<B) public static inline function floatBinopLt(a:Float, b:Expr):Expr return (a:Expr).lt(b);
+	@:op(A<=B) public static inline function floatBinopLe(a:Float, b:Expr):Expr return (a:Expr).le(b);
 		
 	@:arrayAccess
-	public inline function opGetField(v:String)
-		return getField(v);
+	public inline function opBracket(v:String)
+		return bracket(v);
 		
 	// Accessing ReQL
 	public inline function changes():Expr
@@ -276,6 +256,8 @@ abstract Expr(Term) from Term to Term {
 		return TSetIntersection([this, v]);
 	public inline function setDifference(v:Exprs):Expr
 		return TSetDifference([this, v]);
+	public inline function bracket(v:Expr):Expr
+		return TBracket([this, v]);
 	public inline function getField(v:Expr):Expr
 		return TGetField([this, v]);
 	public inline function hasFields(v1:Expr, ?v2:Expr, ?v3:Expr, ?v4:Expr, ?v5:Expr):Expr
