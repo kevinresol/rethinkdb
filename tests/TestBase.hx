@@ -20,7 +20,7 @@ class TestBase {
 	var count:Int;
 	var total:Int;
 	var errors:Array<Error>;
-	var done:FutureTrigger<Outcome<Int, Array<Error>>>;
+	var done:FutureTrigger<Pair<Int, Array<Error>>>;
 	
 	function retain() {
 		count++;
@@ -29,7 +29,7 @@ class TestBase {
 		
 	function release()
 		if(--count == 0)
-			done.trigger(errors.length == 0 ? Success(total) : Failure(errors));
+			done.trigger(new Pair(total, errors));
 	
 	function handle(s:Surprise<Noise, Error>) 
 		s.handle(function(o) {
@@ -66,7 +66,7 @@ class TestBase {
 			case Failure(f): try {
 				var err:ReqlError = f.data;
 				try compare(errName, err.getName()) catch(e:Dynamic) {
-					trace(err.getParameters()[0]);
+					trace('Expected $errName, got ' +  err.getName() + ' - ' + err.getParameters()[0]);
 					throw e;
 				}
 				compare(message, (err.getParameters()[0]:String).split('\n')[0]);
@@ -83,7 +83,7 @@ class TestBase {
 		errors = [];
 		done = Future.trigger();
 		test();
-		if(total == 0) done.trigger(Success(total));
+		if(total == 0) done.trigger(new Pair(total, []));
 		return done.asFuture();
 	}
 	

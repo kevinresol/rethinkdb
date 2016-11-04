@@ -57,6 +57,10 @@ abstract Expr(Term) from Term to Term {
 	@:from
 	public static inline function ofFunc0(f:Void->Expr):Expr
 		return f();
+		
+	@:from
+	public static inline function ofFunc1Opt(f:?Expr->Expr):Expr
+		return f(null);
 	
 	@:from
 	public static function ofFunc1(f:Expr->Expr):Expr {
@@ -137,8 +141,8 @@ abstract Expr(Term) from Term to Term {
 	// Selecting data
 	public inline function between(lower:Expr, upper:Expr):Expr
 		return TBetween([this, lower, upper]);
-	public inline function filter(f:Expr->Expr):Expr
-		return TFilter([this, (f:Expr)]);
+	public inline function filter(f:Expr->Expr, ?opt:Options):Expr
+		return TFilter([this, (f:Expr)], opt);
 	
 	// Joins
 	public inline function innerJoin(v:Expr, f:Expr->Expr->Expr):Expr

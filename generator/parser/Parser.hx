@@ -337,6 +337,7 @@ class Mapper {
 					case 'default' | 'do':
 						// escape keywords
 						field + '_';
+					case v if(v.endsWith('_')): v.substr(0, v.length - 1);
 					default:
 						// convert snake_case to camelCase
 						var f = field;

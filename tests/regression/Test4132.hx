@@ -3,8 +3,8 @@ import rethinkdb.RethinkDB.r;
 import rethinkdb.reql.*;
 class Test4132 extends TestBase {
 	override function test() {
-		assertAtom(true, r.and_());
-		assertAtom(false, r.or_());
-		assertAtom("nil", r.expr(false).or_(nil));
+		assertAtom(true, r.and());
+		assertAtom(false, r.or());
+		assertAtom("nil", r.expr(false).or(nil));
 	}
 }
