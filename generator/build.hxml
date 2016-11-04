@@ -1,4 +1,7 @@
 -main Main
--x gen
+# -x gen
+-js gen.js
+-cmd node gen.js
+-lib hxnodejs
 -lib yaml
 -lib hxparse 

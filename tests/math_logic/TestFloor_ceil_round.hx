@@ -3,6 +3,7 @@ import rethinkdb.RethinkDB.r;
 import rethinkdb.reql.*;
 class TestFloor_ceil_round extends TestBase {
 	override function test() {
+		assertAtom("NUMBER", r.floor(1.0).typeOf());
 		assertAtom(1, r.floor(1.0));
 		assertAtom(1, r.expr(1.0).floor());
 		assertAtom(0, r.floor(0.5));
@@ -12,6 +13,7 @@ class TestFloor_ceil_round extends TestBase {
 		assertAtom(-1, r.floor(-1.0));
 		assertAtom(-2, r.floor(-1.5));
 		assertError("ReqlQueryLogicError", "Expected type NUMBER but found STRING.", r.expr("X").floor());
+		assertAtom("NUMBER", r.ceil(1.0).typeOf());
 		assertAtom(1, r.ceil(1.0));
 		assertAtom(1, r.expr(1.0).ceil());
 		assertAtom(1, r.ceil(0.5));
@@ -21,6 +23,7 @@ class TestFloor_ceil_round extends TestBase {
 		assertAtom(-1, r.ceil(-1.0));
 		assertAtom(-1, r.ceil(-1.5));
 		assertError("ReqlQueryLogicError", "Expected type NUMBER but found STRING.", r.expr("X").ceil());
+		assertAtom("NUMBER", r.round(1.0).typeOf());
 		assertAtom(1, r.round(1.0));
 		assertAtom(1, r.expr(1.0).round());
 		assertAtom(1, r.round(0.5));

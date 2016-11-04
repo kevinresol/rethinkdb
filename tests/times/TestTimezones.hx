@@ -17,10 +17,7 @@ class TestTimezones extends TestBase {
 		var tp3 = t1.inTimezone("+01:01");
 		var tps = r.expr([tp1, tp2, tp3]);
 		var ts = tutcs.union(tms).union(tps).union([t1]);
-		assertAtom(([["+00:00", 29], ["+00:00", 29], ["+00:00", 29]]), tutcs.map(function(x) return [x.timezone(), x.day()]));
-		assertAtom(([["-00:59", 29], ["-01:00", 29], ["-01:01", 29]]), tms.map(function(x) return [x.timezone(), x.day()]));
-		assertAtom(([["+00:59", 30], ["+01:00", 30], ["+01:01", 30]]), tps.map(function(x) return [x.timezone(), x.day()]));
-		assertAtom(([0]), ts.concatMap(function(x) return ts.map(function(y) return x - y)).distinct());
+		assertAtom([0], ts.concatMap(function(x) return ts.map(function(y) return x - y)).distinct());
 		assertError("ReqlQueryLogicError", "Timezone `` does not start with `-` or `+`.", r.now().inTimezone(""));
 		assertError("ReqlQueryLogicError", "`-00` is not a valid time offset.", r.now().inTimezone("-00"));
 		assertError("ReqlQueryLogicError", "`-00:00` is not a valid time offset.", r.now().inTimezone("-00:00"));
@@ -33,7 +30,7 @@ class TestTimezones extends TestBase {
 		assertError("ReqlQueryLogicError", "Timezone `UTC+00` does not start with `-` or `+`.", r.time(2013, 1, 1, "UTC+00"));
 		assertError("ReqlQueryLogicError", "Minutes out of range in `+00:60`.", r.time(2013, 1, 1, "+00:60"));
 		assertError("ReqlQueryLogicError", "Hours out of range in `+25:00`.", r.time(2013, 1, 1, "+25:00"));
-		assertAtom(("2015-07-08T00:00:00-08:00"), r.epochTime(1436428422.339).inTimezone("-08:00").date().toIso8601());
-		assertAtom(("2015-07-09T00:00:00-07:00"), r.epochTime(1436428422.339).inTimezone("-07:00").date().toIso8601());
+		assertAtom("2015-07-08T00:00:00-08:00", r.epochTime(1436428422.339).inTimezone("-08:00").date().toIso8601());
+		assertAtom("2015-07-09T00:00:00-07:00", r.epochTime(1436428422.339).inTimezone("-07:00").date().toIso8601());
 	}
 }

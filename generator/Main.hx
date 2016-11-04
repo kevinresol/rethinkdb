@@ -46,7 +46,8 @@ class Main {
 		for(p in ('$root/$path').readDirectory()) {
 			if('$root/$path/$p'.isDirectory()) handleDirectory('$path/$p');
 			else if(p.indexOf('.') != p.lastIndexOf('.')) continue;
-			// else if(p != 'add.yaml') continue;
+			// else if(p != 'operations.yaml') continue;
+			// else handleFile('$path/$p');
 			else try handleFile('$path/$p') catch(e:Dynamic) {
 				trace(e);
 			}
@@ -67,31 +68,47 @@ class Main {
 		
 		for(test in (tests.tests:Array<Dynamic>)) {
 			// if(exprs.length > 3) break;
-			var str:String = test.py == null ? test.cd : test.py;
-			var out:String = Std.string(test.ot);
+			var str:Dynamic = test.py == null ? test.cd : test.py;
+			
+			var out:String = 
+				if(!Reflect.hasField(test, 'ot')) null;
+				else if(test.ot == null) 'null';
+				else if(test.ot.py != null) Std.is(test.ot.py, String) && (test.ot.py:String).startsWith('err') ? test.ot.py : haxe.Json.stringify(test.ot.py); 
+				else if(test.ot.cd != null) Std.is(test.ot.cd, String) && (test.ot.cd:String).startsWith('err') ? test.ot.cd : haxe.Json.stringify(test.ot.cd);
+				else Std.is(test.ot, String) && (test.ot:String).startsWith('err') ? test.ot : haxe.Json.stringify(test.ot);
+			if(out != null && out.startsWith('"(') && out.endsWith(')"')) out = out.substr(2, out.length - 4); 
+			if(out != null && out.startsWith('\\"') && out.endsWith('\\"')) out = out.substr(1, out.length - 3) + '"'; 
+			if(out != null && out.startsWith('\\\'') && out.endsWith('\\\'')) out = out.substr(1, out.length - 3) + "'"; 
 			var def:String = test.def;
-			// trace(str, out);
+			if(out == null) trace(test);
 			if(str != null) {
 				try {
 					
-					var parser = new parser.Parser(byte.ByteData.ofString(str), 'test');
-					var expr = parser.parse();
-					var parsed = printer.print(expr);
-					var action = mapper.map(expr);
-					
-					var parser = new parser.Parser(byte.ByteData.ofString(out), 'test');
-					var expr = parser.parse();
-					var parsed = printer.print(expr);
-					var assert = switch mapper.map(expr) {
-						case {expr:ECall({expr: EConst(CIdent('err'))}, p)}: macro assertError(${p[0]}, ${p[1]}, $action);
-						case e: macro assertAtom($e, $action);
+					function add(str:String) {
+						var parser = new parser.Parser(byte.ByteData.ofString(str), 'test');
+						var expr = parser.parse();
+						var parsed = printer.print(expr);
+						var action = mapper.map(expr);
+						
+						var parser = new parser.Parser(byte.ByteData.ofString(out), 'test');
+						var expr = parser.parse();
+						var parsed = printer.print(expr);
+						var assert = switch mapper.map(expr) {
+							case {expr:ECall({expr: EConst(CIdent('err'))}, p)}: macro assertError(${p[0]}, ${p[1]}, $action);
+							case {expr:ECall({expr: EConst(CIdent('err_regex'))}, p)}: macro assertErrorRegex(${p[0]}, ${p[1]}, $action);
+							case e: macro assertAtom($e, $action);
+						}
+						
+						exprs.push(assert);
 					}
 					
-					exprs.push(assert);
+					if(Std.is(str, Array)) for(s in (str:Array<String>)) add(s);
+					else add(str);
 					
 				} catch(e:Dynamic) {
+					trace(out);
 					trace(e);
-					// continue
+					// keep going
 				}
 			}
 			if(def != null) {

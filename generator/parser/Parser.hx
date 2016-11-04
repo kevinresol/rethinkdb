@@ -1,6 +1,7 @@
 package parser;
 
 import haxe.macro.Expr.ExprDef;
+using StringTools;
 
 enum Token {
 	TPOpen;
@@ -125,7 +126,7 @@ class Lexer extends hxparse.Lexer implements hxparse.RuleBuilder {
 			lexer.token(string2);
 		},
 		"'" => lexer.curPos().pmax,
-		"[^$\\\\']+" => {
+		"[^\\\\']+" => {
 			buf.add(lexer.current);
 			lexer.token(string2);
 		}
@@ -228,6 +229,11 @@ class Parser extends hxparse.Parser<hxparse.LexerTokenSource<Token>, Token> impl
 		return switch stream {
 			case [TColon, e = expr(), l = parseObjDecl()]:
 				l.unshift({field:name, expr: e});
+				for(i in l) {
+					inline function s(v:String) return i.field.startsWith(v);
+					inline function e(v:String) return i.field.endsWith(v);
+					if(!s('"') && !e('"') && !s('\'') && !e('\'')) i.field = '"${i.field}"';
+				}
 				EObjectDecl(l);
 			// case _:
 			// 	var e = next(EConst(c));
