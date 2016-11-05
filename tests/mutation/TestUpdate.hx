@@ -7,6 +7,9 @@ using tink.CoreApi;
 	@:async
 	override function test() {
 		{
+			var _tables = ["tbl", "tbl2"];
+			@:await createTables(_tables);
+			var tbl = r.db("test").table("tbl"), tbl2 = r.db("test").table("tbl2");
 			@:await assertAtom(100, tbl.count());
 			@:await assertAtom(100, tbl2.count());
 			@:await assertAtom({ "deleted" : 0, "replaced" : 0, "unchanged" : 1, "errors" : 0, "skipped" : 0, "inserted" : 0 }, tbl.get(12).update(function(row) return row));
@@ -35,6 +38,7 @@ using tink.CoreApi;
 			@:await assertAtom({ "id" : 0, "foo" : { "bar" : 2, "buzz" : 2 } }, tbl2.orderBy("id").nth(0));
 			@:await assertAtom({ "deleted" : 0, "replaced" : 100, "unchanged" : 0, "errors" : 0, "skipped" : 0, "inserted" : 0 }, tbl2.update({ "foo" : r.literal(1) }));
 			@:await assertAtom({ "id" : 0, "foo" : 1 }, tbl2.orderBy("id").nth(0));
+			@:await dropTables(_tables);
 		};
 		return Noise;
 	}

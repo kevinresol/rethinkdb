@@ -33,6 +33,7 @@ class Main {
 		}
 		
 		src.splice(s + 1, e - s - 1);
+		tests.sort(Reflect.compare);
 		for(i in 0...tests.length) {
 			src.insert(s + i + 1, '\t\t\tnew ' + tests[i] + '(conn),');
 		}
@@ -65,6 +66,12 @@ class Main {
 		
 		var printer = parser.Parser.Printer;
 		var mapper = parser.Parser.Mapper;
+		
+		var tables = [];
+		if(tests.table_variable_name != null) {
+			var names:String = tests.table_variable_name;
+			tables = names.replace(', ', ' ').split(' ');
+		}
 		
 		for(test in (tests.tests:Array<Dynamic>)) {
 			// if(exprs.length > 3) break;
@@ -138,11 +145,28 @@ class Main {
 			
 		}
 		
+		var tableIdents = tables.map(function(n) return {expr: EConst(CString(n)), pos: null});
+		var tableVars = tables.map(function(n) {
+			var i = {expr: EConst(CString(n)), pos: null};
+			return {
+				name: n,
+				expr: macro r.db('test').table($i),
+				type: null,
+			}	
+		});
+		
+		if(tables.length > 0) {
+			exprs = [
+				(macro var _tables = $a{tableIdents}),
+				(macro @:await createTables(_tables)),
+				{expr: EVars(tableVars), pos: null},
+			].concat(exprs).concat([
+				(macro @:await dropTables(_tables)),
+			]);
+		}
+		exprs.push(macro return Noise);
 		var cl = macro class $name extends TestBase {
-			@:async override function test() {
-				$b{exprs};
-				return Noise;
-			}
+			@:async override function test() $b{exprs};
 		}
 		
 		cl.meta = [{name: ':await', pos: null}];

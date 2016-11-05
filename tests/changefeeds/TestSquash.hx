@@ -7,6 +7,9 @@ using tink.CoreApi;
 	@:async
 	override function test() {
 		{
+			var _tables = ["tbl"];
+			@:await createTables(_tables);
+			var tbl = r.db("test").table("tbl");
 			@:await assertAtom("STREAM", tbl.changes({ "squash" : true }).typeOf());
 			@:await assertAtom(1, tbl.insert({ "id" : 100 })["inserted"]);
 			@:await assertAtom(1, tbl.get(100).update({ "a" : 1 })["replaced"]);
@@ -16,6 +19,7 @@ using tink.CoreApi;
 			@:await assertAtom([{ "new_val" : { "id" : 100 }, "old_val" : null }], squash_changes);
 			@:await assertError("ReqlQueryLogicError", "Expected BOOL or NUMBER but found NULL.", tbl.changes({ "squash" : null }));
 			@:await assertError("ReqlQueryLogicError", "Expected BOOL or a positive NUMBER but found a negative NUMBER.", tbl.changes({ "squash" : -10 }));
+			@:await dropTables(_tables);
 		};
 		return Noise;
 	}

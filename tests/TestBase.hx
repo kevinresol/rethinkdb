@@ -116,6 +116,16 @@ class TestBase {
 		return handle(f);
 	}
 	
+	function createTables(names:Array<String>) {
+		return Future.ofMany([for(name in names) r.db('test').tableCreate(name).run(conn)]) >>
+			function(_) return Noise;
+	}
+	
+	function dropTables(names:Array<String>) {
+		return Future.ofMany([for(name in names) r.db('test').tableDrop(name).run(conn)]) >>
+			function(_) return Noise;
+	}
+	
 	function arrlen(len:Int, other:Dynamic) {
 		return new ArrLen(len, other);
 	}

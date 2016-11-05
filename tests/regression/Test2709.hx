@@ -7,8 +7,12 @@ using tink.CoreApi;
 	@:async
 	override function test() {
 		{
+			var _tables = ["tbl"];
+			@:await createTables(_tables);
+			var tbl = r.db("test").table("tbl");
 			@:await assertAtom(999, tbl.map(function(thing) return "key").count());
 			@:await assertAtom(999, tbl.map(function(thing) return "key").count());
+			@:await dropTables(_tables);
 		};
 		return Noise;
 	}

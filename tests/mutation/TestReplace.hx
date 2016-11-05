@@ -7,6 +7,9 @@ using tink.CoreApi;
 	@:async
 	override function test() {
 		{
+			var _tables = ["tbl"];
+			@:await createTables(_tables);
+			var tbl = r.db("test").table("tbl");
 			@:await assertAtom(100, tbl.count());
 			@:await assertAtom({ "deleted" : 0.0, "replaced" : 0.0, "unchanged" : 1, "errors" : 0.0, "skipped" : 0.0, "inserted" : 0.0 }, tbl.get(12).replace(function(row) return { "id" : row["id"] }));
 			@:await assertAtom({ "deleted" : 0.0, "replaced" : 1, "unchanged" : 0.0, "errors" : 0.0, "skipped" : 0.0, "inserted" : 0.0 }, tbl.get(12).replace(function(row) return { "id" : row["id"], "a" : row["id"] }));
@@ -22,6 +25,7 @@ using tink.CoreApi;
 			@:await assertAtom(1, tbl.get("sdfjk").replace({ "id" : "sdfjk" })["inserted"]);
 			@:await assertAtom(1, tbl.get("sdfjki").replace({ "id" : "sdfjk" })["errors"]);
 			@:await assertAtom({ "deleted" : 0.0, "replaced" : 0.0, "unchanged" : 0.0, "errors" : 0.0, "skipped" : 1, "inserted" : 0.0 }, tbl.get("non-existant").replace(null));
+			@:await dropTables(_tables);
 		};
 		return Noise;
 	}

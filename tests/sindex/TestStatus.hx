@@ -7,6 +7,9 @@ using tink.CoreApi;
 	@:async
 	override function test() {
 		{
+			var _tables = ["tbl2"];
+			@:await createTables(_tables);
+			var tbl2 = r.db("test").table("tbl2");
 			@:await assertAtom({ "created" : 1 }, tbl2.indexCreate("a"));
 			@:await assertAtom({ "created" : 1 }, tbl2.indexCreate("b"));
 			@:await assertAtom(2, tbl2.indexStatus().count());
@@ -24,6 +27,7 @@ using tink.CoreApi;
 			@:await assertAtom({ "created" : 1 }, tbl2.indexCreate("quux"));
 			@:await assertAtom([{ "index" : "quux", "ready" : true }], tbl2.indexWait("quux").pluck("index", "ready"));
 			@:await assertAtom("PTYPE<BINARY>", tbl2.indexWait("quux").nth(0).getField("function").typeOf());
+			@:await dropTables(_tables);
 		};
 		return Noise;
 	}

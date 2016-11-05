@@ -9,14 +9,20 @@ import rethinkdb.response.*;
 using RethinkDBApi;
 using tink.CoreApi;
 
+@:await
 class RunTests {
 	
-	static function main() {
+	@:await static function main() {
 		
 		var conn = r.connect();
 		var tests = [
 			// >>>>
 			// new TestArity(conn),
+			// new TestDefault(conn),
+			// new TestMatch(conn),
+			new TestPolymorphism(conn),
+			// new TestRange(conn),
+			// new TestTimeout(conn),
 			// new changefeeds.TestIdxcopy(conn),
 			// new changefeeds.TestSindex(conn),
 			// new changefeeds.TestSquash(conn),
@@ -26,13 +32,11 @@ class RunTests {
 			// new datum.TestObject(conn),
 			// new datum.TestTypeof(conn),
 			// new datum.TestUuid(conn),
-			new TestDefault(conn),
 			// new geo.TestConstructors(conn),
 			// new geo.TestGeojson(conn),
 			// new geo.TestIntersection_inclusion(conn),
 			// new geo.TestOperations(conn),
 			// new geo.TestPrimitives(conn),
-			// new TestMatch(conn),
 			// new math_logic.TestAdd(conn),
 			// new math_logic.TestAliases(conn),
 			// new math_logic.TestDiv(conn),
@@ -48,8 +52,6 @@ class RunTests {
 			// new mutation.TestReplace(conn),
 			// new mutation.TestSync(conn),
 			// new mutation.TestUpdate(conn),
-			// new TestPolymorphism(conn),
-			// new TestRange(conn),
 			// new regression.Test1001(conn),
 			// new regression.Test1005(conn),
 			// new regression.Test1081(conn),
@@ -100,7 +102,6 @@ class RunTests {
 			// new regression.Test831(conn),
 			// new sindex.TestNullsinstrings(conn),
 			// new sindex.TestStatus(conn),
-			// new TestTimeout(conn),
 			// new times.TestApi(conn),
 			// new times.TestPortions(conn),
 			// new times.TestTimezones(conn),
@@ -110,16 +111,15 @@ class RunTests {
 			// <<<<
 		];
 		
-		Future.ofMany([for(test in tests) test.run()]).handle(function(outcomes) {
-			var errors = [];
-			var total = 0;
-			for(o in outcomes)  {
-				total += o.a;
-				errors = errors.concat(o.b);
-			}
-			trace('$total Tests : ${errors.length} Errors');
-			if(errors.length > 0) for(e in errors) trace(e);
-			Sys.exit(errors.length);
-		});
+		var errors = [];
+		var total = 0;
+		for(test in tests) {
+			var o = @:await test.run();
+			total += o.a;
+			errors = errors.concat(o.b);
+		}
+		trace('$total Tests : ${errors.length} Errors');
+		if(errors.length > 0) for(e in errors) trace(e);
+		Sys.exit(errors.length);
 	}
 }

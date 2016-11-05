@@ -7,6 +7,9 @@ using tink.CoreApi;
 	@:async
 	override function test() {
 		{
+			var _tables = ["tbl"];
+			@:await createTables(_tables);
+			var tbl = r.db("test").table("tbl");
 			var db = r.db("test");
 			var obj = r.expr({ "a" : 1 });
 			var array = r.expr([1]);
@@ -118,6 +121,7 @@ using tink.CoreApi;
 			@:await assertError("ReqlCompileError", "Expected 3 arguments but found 4.", tbl.indexRename("idx", "idx2", "idx3"));
 			@:await assertError("ReqlServerCompileError", "Expected 0 arguments but found 1.", r.now("foo"));
 			@:await assertError("ReqlQueryLogicError", "Expected 0 arguments but found 3.", r.now(r.args([1, 2, 3])));
+			@:await dropTables(_tables);
 		};
 		return Noise;
 	}

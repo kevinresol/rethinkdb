@@ -7,6 +7,9 @@ using tink.CoreApi;
 	@:async
 	override function test() {
 		{
+			var _tables = ["tbl"];
+			@:await createTables(_tables);
+			var tbl = r.db("test").table("tbl");
 			@:await assertPartial({ "inserted" : 2 }, tbl.insert([{ "id" : 0.0, "value" : "abc" }, { "id" : [1, -0.0], "value" : "def" }]));
 			@:await assertAtom({ "id" : 0, "value" : "abc" }, tbl.get(0.0));
 			@:await assertAtom({ "id" : 0, "value" : "abc" }, tbl.get(-0.0));
@@ -20,6 +23,7 @@ using tink.CoreApi;
 			@:await assertPartial({ "errors" : 1 }, tbl.insert({ "id" : [1, 0.0] }));
 			@:await assertPartial({ "errors" : 1 }, tbl.insert({ "id" : -0.0 }));
 			@:await assertPartial({ "errors" : 1 }, tbl.insert({ "id" : [1, -0.0] }));
+			@:await dropTables(_tables);
 		};
 		return Noise;
 	}
