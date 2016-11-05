@@ -137,8 +137,6 @@ class Main {
 						var assert = switch mapper.map(expr) {
 							case {expr:ECall({expr: EConst(CIdent('err'))}, p)}: macro assertError(${p[0]}, ${p[1]}, $action);
 							case {expr:ECall({expr: EConst(CIdent('err_regex'))}, p)}: macro assertErrorRegex(${p[0]}, ${p[1]}, $action);
-							case {expr:ECall({expr: EConst(CIdent('partial'))}, p)}: macro assertPartial(${p[0]}, $action);
-							case {expr:ECall({expr: EConst(CIdent('bag'))}, p)}: macro assertBag(${p[0]}, $action);
 							case {expr:ECall({expr: EConst(CIdent('int_cmp'))}, p)}: macro assertAtom(${p[0]}, $action);
 							case {expr:ECall({expr: EConst(CIdent('float_cmp'))}, p)}: macro assertAtom(${p[0]}, $action);
 							case e: macro assertAtom($e, $action);

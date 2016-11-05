@@ -57,7 +57,7 @@ using tink.CoreApi;
 		@:await assertAtom([{ "a" : 1 }], arr.filter(function(x) return r.or(x["a"].eq(1), x["a"]["b"].eq(2)), { "default" : false }));
 		@:await assertAtom(([{  }, { "a" : null }, { "a" : 1 }]), arr.filter(function(x) return r.or(x["a"].eq(1), x["a"]["b"].eq(2)), { "default" : true }).orderBy("a"));
 		@:await assertError("ReqlNonExistenceError", "No attribute `a` in object:", arr.filter(function(x) return r.or(x["a"].eq(1), x["a"]["b"].eq(2)), { "default" : r.error() }));
-		@:await assertPartial({ "tables_created" : 1 }, r.tableCreate("default_test"));
+		@:await assertAtom(partial({ "tables_created" : 1 }), r.tableCreate("default_test"));
 		@:await assertAtom(({ "deleted" : 0, "replaced" : 0, "generated_keys" : arrlen(3, uuid()), "unchanged" : 0, "errors" : 0, "skipped" : 0, "inserted" : 3 }), r.table("default_test").insert(arr));
 		var tbl = r.table("default_test").orderBy("a").pluck("a");
 		@:await assertAtom([{ "a" : 1 }], tbl.filter(function(x) return x["a"].eq(1)));
@@ -75,7 +75,7 @@ using tink.CoreApi;
 		@:await assertAtom([{ "a" : 1 }], tbl.filter(function(x) return r.or(x["a"].eq(1), x["a"]["b"].eq(2)), { "default" : false }));
 		@:await assertAtom(([{  }, { "a" : null }, { "a" : 1 }]), tbl.filter(function(x) return r.or(x["a"].eq(1), x["a"]["b"].eq(2)), { "default" : true }).orderBy("a"));
 		@:await assertError("ReqlNonExistenceError", "No attribute `a` in object:", tbl.filter(function(x) return r.or(x["a"].eq(1), x["a"]["b"].eq(2)), { "default" : r.error() }));
-		@:await assertPartial({ "tables_dropped" : 1 }, r.tableDrop("default_test"));
+		@:await assertAtom(partial({ "tables_dropped" : 1 }), r.tableDrop("default_test"));
 		return Noise;
 	}
 }

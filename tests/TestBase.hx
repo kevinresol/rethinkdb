@@ -23,6 +23,14 @@ class TestBase {
 			cond: function(e, a) return Std.is(e, Uuid),
 			check: function(e, a) cast(e, Uuid).check(a),
 		},
+		{
+			cond: function(e, a) return Std.is(e, Bag),
+			check: function(e, a) cast(e, Bag).check(a),
+		},
+		{
+			cond: function(e, a) return Std.is(e, Partial),
+			check: function(e, a) cast(e, Partial).check(a),
+		},
 	];
 	
 	public function new(conn) {
@@ -55,43 +63,6 @@ class TestBase {
 					Success(Noise); 
 				} catch(err:String) {
 					// trace('Expected $v, got $ret', '');
-					Failure(new Error(err, pos));
-				}
-			case Failure(f): Failure(new Error('Unexpected error $f', pos));
-		});
-		
-		return handle(f);
-	}
-	
-	function assertBag(v:Array<Dynamic>, e:Expr, ?pos:haxe.PosInfos) {
-		var f = e.run(conn).asCursor().flatMap(function(o) return switch o {
-			case Success(cur):
-				cur.toArray() >> 
-					function(arr:Array<Dynamic>) return try {
-						compare(v, arr);
-						Success(Noise); 
-					} catch(err:String) {
-						trace('Expected $v, got $arr');
-						Failure(new Error(err, pos));
-					}
-			case Failure(f): Future.sync(Failure(new Error('Unexpected error $f', pos)));
-		});
-		
-		return handle(f);
-	}
-	
-	function assertPartial(v:{}, e:Expr, ?pos:haxe.PosInfos) {
-		var f = e.run(conn).asAtom().map(function(o) return switch o {
-			case Success(ret):
-				try {
-					if(!Reflect.isObject(ret)) throw 'Expected object, got $ret';
-					for(field in Reflect.fields(v)) {
-						if(!Reflect.hasField(ret, field)) throw 'Does not contain field $field';
-						compare(Reflect.field(v, field), Reflect.field(ret, field));
-					}
-					Success(Noise); 
-				} catch(err:String) {
-					trace('Expected $v, got $ret');
 					Failure(new Error(err, pos));
 				}
 			case Failure(f): Failure(new Error('Unexpected error $f', pos));
@@ -151,8 +122,14 @@ class TestBase {
 	function arrlen(len:Int, other:Dynamic) {
 		return new ArrLen(len, other);
 	}
-	function uuid<T>() {
+	function uuid() {
 		return new Uuid();
+	}
+	function bag(items:Array<Dynamic>) {
+		return new Bag(items);
+	}
+	function partial(obj:Dynamic) {
+		return new Partial(obj);
 	}
 	
 	@:async public function run() {
@@ -193,5 +170,42 @@ class ArrLen {
 		if(other.length != length) throw 'Not of the expected length';
 		if(item == null) return;
 		for(i in other) TestBase.compare(item, i);
+	}
+}
+
+class Bag {
+	var items:Array<Dynamic>;
+	public function new(items:Array<Dynamic>) {
+		this.items = items;
+	}
+	
+	public function check(other:Dynamic) {
+		if(!Std.is(other, Array)) throw 'Not array';
+		var other:Array<Dynamic> = cast other;
+		if(other.length != items.length) throw 'Not of the expected length';
+		if(items == null) return;
+		for(i in items) {
+			var matched = false;
+			for(o in other) try {
+				TestBase.compare(i, o);
+				matched = true;
+				break;
+			} catch(e:Dynamic) {}
+			if(!matched) throw '$i not found in bag';
+		}
+	}
+}
+class Partial {
+	var obj:Dynamic;
+	public function new(obj:Dynamic) {
+		this.obj = obj;
+	}
+	
+	public function check(other:Dynamic) {
+		if(!Reflect.isObject(other)) throw 'Expected object, got $other';
+		for(field in Reflect.fields(obj)) {
+			if(!Reflect.hasField(other, field)) throw 'Does not contain field $field';
+			TestBase.compare(Reflect.field(obj, field), Reflect.field(other, field));
+		}
 	}
 }

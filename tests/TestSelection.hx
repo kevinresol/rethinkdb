@@ -32,7 +32,7 @@ using tink.CoreApi;
 		@:await assertAtom(null, tbl.get(2000));
 		@:await assertError("ReqlCompileError", "Expected 2 arguments but found 1.", tbl.get());
 		@:await assertError("ReqlCompileError", "Expected 2 arguments but found 3.", tbl.get(10, 20));
-		@:await assertPartial({ "tables_created" : 1 }, r.db("test").tableCreate("testpkey", { "primary_key" : "foo" }));
+		@:await assertAtom(partial({ "tables_created" : 1 }), r.db("test").tableCreate("testpkey", { "primary_key" : "foo" }));
 		var tblpkey = r.db("test").table("testpkey");
 		@:await assertAtom({ "deleted" : 0.0, "replaced" : 0.0, "unchanged" : 0.0, "errors" : 0.0, "skipped" : 0.0, "inserted" : 1 }, tblpkey.insert({ "foo" : 10, "a" : 10 }));
 		@:await assertAtom({ "foo" : 10, "a" : 10 }, tblpkey.get(10));

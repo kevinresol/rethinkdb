@@ -83,7 +83,7 @@ using tink.CoreApi;
 		@:await assertError("ReqlCompileError", "Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.", r.expr([1, 2]).map(r.db("test").tableCreate("table_create_failure")));
 		@:await assertError("ReqlCompileError", "Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.", r.expr([1, 2]).map(tbl.insert({ "foo" : r.row }).getField("inserted")));
 		@:await assertError("ReqlCompileError", "Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.", r.expr([1, 2]).map(tbl.insert({ "foo" : r.row }).getField("inserted").add(5)));
-		@:await assertPartial({ "tables_created" : 1 }, r.expr(1).do_(r.db("test").tableCreate("table_create_success")));
+		@:await assertAtom(partial({ "tables_created" : 1 }), r.expr(1).do_(r.db("test").tableCreate("table_create_success")));
 		@:await assertAtom([1, 2], r.expr([1, 2]));
 		@:await dropTables(_tables);
 		return Noise;
