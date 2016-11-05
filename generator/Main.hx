@@ -151,6 +151,8 @@ class Main {
 			'package ' + pack.replace('/', '.') + ';',
 			'import rethinkdb.RethinkDB.r;',
 			'import rethinkdb.reql.*;',
+			'using tink.CoreApi',
+			'',
 			new haxe.macro.Printer().printTypeDefinition(cl)
 		];
 		

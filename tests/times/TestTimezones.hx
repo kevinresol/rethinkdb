@@ -1,6 +1,8 @@
 package times;
 import rethinkdb.RethinkDB.r;
 import rethinkdb.reql.*;
+using tink.CoreApi
+
 @:await class TestTimezones extends TestBase {
 	@:async
 	override function test() {

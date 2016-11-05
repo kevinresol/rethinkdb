@@ -49,8 +49,10 @@ class Response {
 		var res = Json.parse(response.json);
 		var type:ResponseType = res.t;
 		
-		inline function fail(ctor:String->Term->Backtrace->ReqlError, ?pos:haxe.PosInfos)
-			return Failure(Error.withData('Error', ctor(res.r[0], query.term, Backtrace.parse(res.b)), pos));
+		inline function fail(ctor:String->Term->Backtrace->ReqlError, ?pos:haxe.PosInfos) {
+			var err = ctor(res.r[0], query.term, Backtrace.parse(res.b));
+			return Failure(Error.withData(err.getName() + ': ' + res.r[0], err, pos));
+		}
 		
 		return switch type {
 			case CLIENT_ERROR: fail(ReqlDriverError);

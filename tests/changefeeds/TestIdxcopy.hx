@@ -1,6 +1,8 @@
 package changefeeds;
 import rethinkdb.RethinkDB.r;
 import rethinkdb.reql.*;
+using tink.CoreApi
+
 @:await class TestIdxcopy extends TestBase {
 	@:async
 	override function test() {

@@ -1,6 +1,8 @@
 package math_logic;
 import rethinkdb.RethinkDB.r;
 import rethinkdb.reql.*;
+using tink.CoreApi
+
 @:await class TestAliases extends TestBase {
 	@:async
 	override function test() {

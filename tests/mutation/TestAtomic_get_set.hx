@@ -1,6 +1,8 @@
 package mutation;
 import rethinkdb.RethinkDB.r;
 import rethinkdb.reql.*;
+using tink.CoreApi
+
 @:await class TestAtomic_get_set extends TestBase {
 	@:async
 	override function test() {

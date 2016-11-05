@@ -1,6 +1,8 @@
 package transform;
 import rethinkdb.RethinkDB.r;
 import rethinkdb.reql.*;
+using tink.CoreApi
+
 @:await class TestTable extends TestBase {
 	@:async
 	override function test() {
