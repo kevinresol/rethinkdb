@@ -26,7 +26,7 @@ class RethinkDB {
 	public inline function dbDrop(name:Expr):Expr
 		return TDbDrop([name]);
 	public inline function dbList():Expr
-		return TDbDrop([]);
+		return TDbList([]);
 		
 	// Manipulating tables
 	public inline function tableCreate(name:Expr):Expr
@@ -84,14 +84,38 @@ class RethinkDB {
 		});
 	
 	// Math and logic
-	public inline function add(v1:Expr, v2:Expr):Expr
-		return TAdd([v1, v2]);
-	public inline function sub(v1:Expr, v2:Expr):Expr
-		return TSub([v1, v2]);
-	public inline function mul(v1:Expr, v2:Expr):Expr
-		return TMul([v1, v2]);
-	public inline function div(v1:Expr, v2:Expr):Expr
-		return TDiv([v1, v2]);
+	public inline function add(e1:Expr, e2:Expr, ?e3:Expr, ?e4:Expr, ?e5:Expr):Expr
+		return TAdd({
+			var args = [e1, e2];
+			if(e3 != null) args.push(e3);
+			if(e4 != null) args.push(e4);
+			if(e5 != null) args.push(e5);
+			args;
+		});
+	public inline function sub(e1:Expr, e2:Expr, ?e3:Expr, ?e4:Expr, ?e5:Expr):Expr
+		return TSub({
+			var args = [e1, e2];
+			if(e3 != null) args.push(e3);
+			if(e4 != null) args.push(e4);
+			if(e5 != null) args.push(e5);
+			args;
+		});
+	public inline function mul(e1:Expr, e2:Expr, ?e3:Expr, ?e4:Expr, ?e5:Expr):Expr
+		return TMul({
+			var args = [e1, e2];
+			if(e3 != null) args.push(e3);
+			if(e4 != null) args.push(e4);
+			if(e5 != null) args.push(e5);
+			args;
+		});
+	public inline function div(e1:Expr,?e2:Expr, ?e3:Expr, ?e4:Expr, ?e5:Expr):Expr
+		return TDiv({
+			var args = [e1, e2];
+			if(e3 != null) args.push(e3);
+			if(e4 != null) args.push(e4);
+			if(e5 != null) args.push(e5);
+			args;
+		});
 	public inline function mod(v1:Expr, v2:Expr):Expr
 		return TMod([v1, v2]);
 	public inline function and(v1:Expr, v2:Expr):Expr

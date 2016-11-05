@@ -83,6 +83,7 @@ class Response {
 	public function asCursor<T>():Outcome<Cursor<T>, Error>
 		return switch type {
 			case SUCCESS_SEQUENCE | SUCCESS_PARTIAL: Success(new Cursor(this, connection, query));
+			case SUCCESS_ATOM if(Std.is(response[0], Array)): Success(new Cursor(this, connection, query));
 			default: Failure(Error.withData('Cannot cast to Cursor', ReqlDriverError('Invalid cast', query.term, [])));
 		}
 		

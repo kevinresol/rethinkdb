@@ -381,7 +381,10 @@ class Mapper {
 						buf.toString();
 				} 
 				ExprDef.EField(map(e), field);
-			case ECall(e, args): ExprDef.ECall(map(e), args.map(map));
+			case ECall(e, args):
+				// convert `r(value)` to `r.expr(value)`
+				if(e.match(EConst(CIdent('r')))) e = EField(EConst(CIdent('r')), 'expr'); 
+				ExprDef.ECall(map(e), args.map(map));
 			case EBinop(op, e1, e2): ExprDef.EBinop(switch op {
 				case OpAdd: OpAdd;
 				case OpSub: OpSub;

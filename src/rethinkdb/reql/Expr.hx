@@ -313,14 +313,42 @@ abstract Expr(Term) from Term to Term {
 		return TDowncase([this]);
 	
 	// Math and logic
-	public inline function add(v:Expr):Expr
-		return TAdd([this, v]);
-	public inline function sub(v:Expr):Expr
-		return TSub([this, v]);
-	public inline function mul(v:Expr):Expr
-		return TMul([this, v]);
-	public inline function div(v:Expr):Expr
-		return TDiv([this, v]);
+	public inline function add(e1:Expr, ?e2:Expr, ?e3:Expr, ?e4:Expr, ?e5:Expr):Expr
+		return TAdd({
+			var args = [this, e1];
+			if(e2 != null) args.push(e2);
+			if(e3 != null) args.push(e3);
+			if(e4 != null) args.push(e4);
+			if(e5 != null) args.push(e5);
+			args;
+		});
+	public inline function sub(e1:Expr, ?e2:Expr, ?e3:Expr, ?e4:Expr, ?e5:Expr):Expr
+		return TSub({
+			var args = [this, e1];
+			if(e2 != null) args.push(e2);
+			if(e3 != null) args.push(e3);
+			if(e4 != null) args.push(e4);
+			if(e5 != null) args.push(e5);
+			args;
+		});
+	public inline function mul(e1:Expr, ?e2:Expr, ?e3:Expr, ?e4:Expr, ?e5:Expr):Expr
+		return TMul({
+			var args = [this, e1];
+			if(e2 != null) args.push(e2);
+			if(e3 != null) args.push(e3);
+			if(e4 != null) args.push(e4);
+			if(e5 != null) args.push(e5);
+			args;
+		});
+	public inline function div(e1:Expr, ?e2:Expr, ?e3:Expr, ?e4:Expr, ?e5:Expr):Expr
+		return TDiv({
+			var args = [this, e1];
+			if(e2 != null) args.push(e2);
+			if(e3 != null) args.push(e3);
+			if(e4 != null) args.push(e4);
+			if(e5 != null) args.push(e5);
+			args;
+		});
 	public inline function mod(v:Expr):Expr
 		return TMod([this, v]);
 	public inline function and(v:Expr):Expr

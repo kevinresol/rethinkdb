@@ -53,8 +53,9 @@ class Cursor<T> extends Generator<T> {
 	}
 	
 	function addResponse(res:Response) {
-		threshold = res.response.length;
-		for(i in res.response) items.push(i);
+		var values = res.type != SUCCESS_ATOM ? res.response : res.response[0];
+		threshold = values.length;
+		for(i in values) items.push(i);
 	}
 	
 }
