@@ -6,3 +6,4 @@
 -lib yaml
 -lib deep-equal
 -lib hxparse
+-lib tink_await

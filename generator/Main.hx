@@ -70,12 +70,20 @@ class Main {
 			// if(exprs.length > 3) break;
 			var str:Dynamic = test.py == null ? test.cd : test.py;
 			
+			function isOutString(v:Dynamic) {
+				return Std.is(v, String) && (
+					(v:String).startsWith('err(') ||
+					(v:String).startsWith('err_regex(') ||
+					(v:String).startsWith('partial(') ||
+					(v:String).startsWith('bag(')
+				);
+			}
 			var out:String = 
 				if(!Reflect.hasField(test, 'ot')) null;
 				else if(test.ot == null) 'null';
-				else if(test.ot.py != null) Std.is(test.ot.py, String) && (test.ot.py:String).startsWith('err') ? test.ot.py : haxe.Json.stringify(test.ot.py); 
-				else if(test.ot.cd != null) Std.is(test.ot.cd, String) && (test.ot.cd:String).startsWith('err') ? test.ot.cd : haxe.Json.stringify(test.ot.cd);
-				else Std.is(test.ot, String) && (test.ot:String).startsWith('err') ? test.ot : haxe.Json.stringify(test.ot);
+				else if(test.ot.py != null) isOutString(test.ot.py) ? test.ot.py : haxe.Json.stringify(test.ot.py); 
+				else if(test.ot.cd != null) isOutString(test.ot.cd) ? test.ot.cd : haxe.Json.stringify(test.ot.cd);
+				else isOutString(test.ot) ? test.ot : haxe.Json.stringify(test.ot);
 			if(out != null && out.startsWith('"(') && out.endsWith(')"')) out = out.substr(2, out.length - 4); 
 			if(out != null && out.startsWith('\\"') && out.endsWith('\\"')) out = out.substr(1, out.length - 3) + '"'; 
 			if(out != null && out.startsWith('\\\'') && out.endsWith('\\\'')) out = out.substr(1, out.length - 3) + "'"; 
@@ -96,10 +104,12 @@ class Main {
 						var assert = switch mapper.map(expr) {
 							case {expr:ECall({expr: EConst(CIdent('err'))}, p)}: macro assertError(${p[0]}, ${p[1]}, $action);
 							case {expr:ECall({expr: EConst(CIdent('err_regex'))}, p)}: macro assertErrorRegex(${p[0]}, ${p[1]}, $action);
+							case {expr:ECall({expr: EConst(CIdent('partial'))}, p)}: macro assertPartial(${p[0]}, $action);
+							case {expr:ECall({expr: EConst(CIdent('bag'))}, p)}: macro assertBag(${p[0]}, $action);
 							case e: macro assertAtom($e, $action);
 						}
 						
-						exprs.push(assert);
+						exprs.push(macro @:await $assert);
 					}
 					
 					if(Std.is(str, Array)) for(s in (str:Array<String>)) add(s);
@@ -129,8 +139,13 @@ class Main {
 		}
 		
 		var cl = macro class $name extends TestBase {
-			override function test() $b{exprs}
+			@:async override function test() {
+				$b{exprs};
+				return Noise;
+			}
 		}
+		
+		cl.meta = [{name: ':await', pos: null}];
 		
 		var src = [
 			'package ' + pack.replace('/', '.') + ';',

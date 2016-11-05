@@ -1,9 +1,13 @@
 package regression;
 import rethinkdb.RethinkDB.r;
 import rethinkdb.reql.*;
-class Test579 extends TestBase {
+@:await class Test579 extends TestBase {
+	@:async
 	override function test() {
-		assertError("ReqlQueryLogicError", "Could not prove function deterministic.  Index functions must be deterministic.", tbl.indexCreate("579", function(rec) return r.js("1")));
-		assertError("ReqlQueryLogicError", "Could not prove function deterministic.  Index functions must be deterministic.", tbl.indexCreate("579", function(rec) return tbl.get(0)));
+		{
+			@:await assertError("ReqlQueryLogicError", "Could not prove function deterministic.  Index functions must be deterministic.", tbl.indexCreate("579", function(rec) return r.js("1")));
+			@:await assertError("ReqlQueryLogicError", "Could not prove function deterministic.  Index functions must be deterministic.", tbl.indexCreate("579", function(rec) return tbl.get(0)));
+		};
+		return Noise;
 	}
 }

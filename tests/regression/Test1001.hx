@@ -1,10 +1,14 @@
 package regression;
 import rethinkdb.RethinkDB.r;
 import rethinkdb.reql.*;
-class Test1001 extends TestBase {
+@:await class Test1001 extends TestBase {
+	@:async
 	override function test() {
-		assertAtom(1, tbl.between(r.minval, r.maxval).count());
-		assertAtom(0, tbl.between(r.minval, r.maxval, { "index" : "a" }).count());
-		assertAtom(0, tbl.between(r.minval, r.maxval, { "index" : "b" }).count());
+		{
+			@:await assertAtom(1, tbl.between(r.minval, r.maxval).count());
+			@:await assertAtom(0, tbl.between(r.minval, r.maxval, { "index" : "a" }).count());
+			@:await assertAtom(0, tbl.between(r.minval, r.maxval, { "index" : "b" }).count());
+		};
+		return Noise;
 	}
 }

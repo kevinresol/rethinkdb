@@ -96,6 +96,7 @@ abstract Expr(Term) from Term to Term {
 	@:from public static inline function ofFloat(v:Float):Expr return TDatum(DNumber(v));
 	@:from public static inline function ofBool(v:Bool):Expr return TDatum(DBool(v));
 	@:from public static inline function ofObject(v:{}):Expr return TDatum(DatumTools.ofAny(v));
+	@:from public static inline function ofAny(v:Dynamic):Expr return TDatum(DatumTools.ofAny(v));
 		
 	@:op(A+B) public inline function opAdd(b:Expr):Expr return add(b);
 	@:op(A-B) public inline function opSub(b:Expr):Expr return sub(b);
@@ -123,7 +124,7 @@ abstract Expr(Term) from Term to Term {
 	@:op(A<=B) public static inline function floatBinopLe(a:Float, b:Expr):Expr return (a:Expr).le(b);
 		
 	@:arrayAccess
-	public inline function opBracket(v:String)
+	public inline function opBracket(v:Expr)
 		return bracket(v);
 		
 	// Accessing ReQL

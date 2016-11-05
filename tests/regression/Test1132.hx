@@ -1,8 +1,12 @@
 package regression;
 import rethinkdb.RethinkDB.r;
 import rethinkdb.reql.*;
-class Test1132 extends TestBase {
+@:await class Test1132 extends TestBase {
+	@:async
 	override function test() {
-		assertError("ReqlQueryLogicError", "Duplicate key \"a\" in JSON.", r.json("{\"a\":1,\"a\":2}"));
+		{
+			@:await assertError("ReqlQueryLogicError", "Duplicate key \"a\" in JSON.", r.json("{\"a\":1,\"a\":2}"));
+		};
+		return Noise;
 	}
 }

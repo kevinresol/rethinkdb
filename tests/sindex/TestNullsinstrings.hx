@@ -1,6 +1,10 @@
 package sindex;
 import rethinkdb.RethinkDB.r;
 import rethinkdb.reql.*;
-class TestNullsinstrings extends TestBase {
-	override function test() { }
+@:await class TestNullsinstrings extends TestBase {
+	@:async
+	override function test() {
+		{ };
+		return Noise;
+	}
 }

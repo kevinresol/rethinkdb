@@ -1,9 +1,13 @@
 package datum;
 import rethinkdb.RethinkDB.r;
 import rethinkdb.reql.*;
-class TestTypeof extends TestBase {
+@:await class TestTypeof extends TestBase {
+	@:async
 	override function test() {
-		assertAtom("NULL", r.expr(null).typeOf());
-		assertAtom("NULL", r.typeOf(null));
+		{
+			@:await assertAtom("NULL", r.expr(null).typeOf());
+			@:await assertAtom("NULL", r.typeOf(null));
+		};
+		return Noise;
 	}
 }

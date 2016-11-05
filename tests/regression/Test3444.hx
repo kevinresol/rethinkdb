@@ -1,6 +1,10 @@
 package regression;
 import rethinkdb.RethinkDB.r;
 import rethinkdb.reql.*;
-class Test3444 extends TestBase {
-	override function test() { }
+@:await class Test3444 extends TestBase {
+	@:async
+	override function test() {
+		{ };
+		return Noise;
+	}
 }

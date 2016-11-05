@@ -1,9 +1,13 @@
 package regression;
 import rethinkdb.RethinkDB.r;
 import rethinkdb.reql.*;
-class Test309 extends TestBase {
+@:await class Test309 extends TestBase {
+	@:async
 	override function test() {
-		assertAtom("bag([{\'id\':0}, {\'id\':1}, 2, 3, 4])", t.union([2, 3, 4]));
-		assertAtom("bag([{\'id\':0}, {\'id\':1}, 2, 3, 4])", r.expr([2, 3, 4]).union(t));
+		{
+			@:await assertBag([{ "id" : 0 }, { "id" : 1 }, 2, 3, 4], t.union([2, 3, 4]));
+			@:await assertBag([{ "id" : 0 }, { "id" : 1 }, 2, 3, 4], r.expr([2, 3, 4]).union(t));
+		};
+		return Noise;
 	}
 }

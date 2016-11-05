@@ -1,8 +1,12 @@
 package regression;
 import rethinkdb.RethinkDB.r;
 import rethinkdb.reql.*;
-class Test1179 extends TestBase {
+@:await class Test1179 extends TestBase {
+	@:async
 	override function test() {
-		assertAtom(1, r.expr([1])[r.expr(0)]);
+		{
+			@:await assertAtom(1, r.expr([1])[r.expr(0)]);
+		};
+		return Noise;
 	}
 }

@@ -31,6 +31,8 @@ class RethinkDB {
 	// Manipulating tables
 	public inline function tableCreate(name:Expr):Expr
 		return TTableCreate([name]);
+	public inline function tableDrop(name:Expr):Expr
+		return TTableDrop([name]);
 		
 	// Selecting data
 	public inline function db(name:Expr):Db
@@ -191,8 +193,8 @@ class RethinkDB {
 		});
 	public inline function error(?v:Expr):Expr
 		return TError(v == null ? [] : [v]);
-	public inline function expr(v:Dynamic):Expr
-		return Std.is(v, Term) ? v : TDatum(DatumTools.ofAny(v));
+	public inline function expr(v:Expr):Expr
+		return v;
 	public inline function js(v:Expr, ?opt:Options):Expr
 		return TJavascript([v], opt);
 	public inline function typeOf(v:Expr):Expr

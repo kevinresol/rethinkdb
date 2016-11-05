@@ -1,8 +1,12 @@
 package regression;
 import rethinkdb.RethinkDB.r;
 import rethinkdb.reql.*;
-class Test568 extends TestBase {
+@:await class Test568 extends TestBase {
+	@:async
 	override function test() {
-		assertError("ReqlQueryLogicError", "Cannot convert STRING to SEQUENCE", tbl.concatMap(function(rec) return rec["name"]));
+		{
+			@:await assertError("ReqlQueryLogicError", "Cannot convert STRING to SEQUENCE", tbl.concatMap(function(rec) return rec["name"]));
+		};
+		return Noise;
 	}
 }

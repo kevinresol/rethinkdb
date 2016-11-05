@@ -44,6 +44,14 @@ class Cursor<T> extends Generator<T> {
 		});
 	}
 	
+	public function toArray() {
+		var data = [];
+		return forEach(function(v) {
+			data.push(v);
+			return true;
+		}) >> function(_) return data;
+	}
+	
 	function addResponse(res:Response) {
 		threshold = res.response.length;
 		for(i in res.response) items.push(i);
