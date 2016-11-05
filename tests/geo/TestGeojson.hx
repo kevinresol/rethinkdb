@@ -1,7 +1,7 @@
 package geo;
 import rethinkdb.RethinkDB.r;
 import rethinkdb.reql.*;
-using tink.CoreApi
+using tink.CoreApi;
 
 @:await class TestGeojson extends TestBase {
 	@:async

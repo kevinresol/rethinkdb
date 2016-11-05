@@ -1,7 +1,7 @@
 package math_logic;
 import rethinkdb.RethinkDB.r;
 import rethinkdb.reql.*;
-using tink.CoreApi
+using tink.CoreApi;
 
 @:await class TestMath extends TestBase {
 	@:async

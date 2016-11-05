@@ -1,7 +1,7 @@
 package regression;
 import rethinkdb.RethinkDB.r;
 import rethinkdb.reql.*;
-using tink.CoreApi
+using tink.CoreApi;
 
 @:await class Test2710 extends TestBase {
 	@:async

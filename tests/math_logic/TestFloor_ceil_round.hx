@@ -1,7 +1,7 @@
 package math_logic;
 import rethinkdb.RethinkDB.r;
 import rethinkdb.reql.*;
-using tink.CoreApi
+using tink.CoreApi;
 
 @:await class TestFloor_ceil_round extends TestBase {
 	@:async
