@@ -96,6 +96,7 @@ abstract Expr(Term) from Term to Term {
 	@:from public static inline function ofFloat(v:Float):Expr return TDatum(DNumber(v));
 	@:from public static inline function ofBool(v:Bool):Expr return TDatum(DBool(v));
 	@:from public static inline function ofObject(v:{}):Expr return TDatum(DatumTools.ofAny(v));
+	@:from public static inline function ofTerm(v:Term):Expr return v;
 	@:from public static inline function ofAny(v:Dynamic):Expr return TDatum(DatumTools.ofAny(v));
 		
 	@:op(A+B) public inline function opAdd(b:Expr):Expr return add(b);
@@ -397,7 +398,7 @@ abstract Expr(Term) from Term to Term {
 	public inline function default_(v:Expr):Expr // TODO: function form
 		return TDefault([this, v]);
 	public inline function coerceTo(v:Expr):Expr // TODO: figure this out...
-		throw 'Not implemented';
+		return TCoerceTo([this, v]);
 	public inline function typeOf():Expr
 		return TTypeOf([this]);
 	public inline function info():Expr

@@ -7,8 +7,8 @@ using tink.CoreApi;
 	@:async
 	override function test() {
 		var d = r.db("test");
-		@:await assertAtom(["rethinkdb", "test"], r.dbList().map(r.row));
-		@:await assertAtom(["t370"], d.tableList().map(r.row));
+		@:await assertAtom((["rethinkdb", "test"]), r.dbList().map(r.row));
+		@:await assertAtom((["t370"]), d.tableList().map(r.row));
 		return Noise;
 	}
 }

@@ -43,7 +43,7 @@ class TestBase {
 				case Success(_):
 				case Failure(f): errors.push(f);
 			}
-			return Success(Noise);
+			return Noise;
 		});
 	}
 	
@@ -51,10 +51,10 @@ class TestBase {
 		var f = e.run(conn).asAtom().map(function(o) return switch o {
 			case Success(ret):
 				try {
-					compare(ret, v);
+					compare(v, ret);
 					Success(Noise); 
 				} catch(err:String) {
-					trace('Expected $v, got $ret');
+					// trace('Expected $v, got $ret', '');
 					Failure(new Error(err, pos));
 				}
 			case Failure(f): Failure(new Error('Unexpected error $f', pos));
@@ -155,10 +155,11 @@ class TestBase {
 		return new Uuid();
 	}
 	
-	public function run() {
+	@:async public function run() {
 		total = 0;
 		errors = [];
-		return test().map(function(_) return new Pair(total, errors));
+		@:await test();
+		return new Pair(total, errors);
 	}
 	
 	@:async function test() {

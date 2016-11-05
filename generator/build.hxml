@@ -3,5 +3,9 @@
 -js gen.js
 -cmd node gen.js
 -lib hxnodejs
--lib yaml
+-lib hscript
 -lib hxparse 
+-lib tink_core
+-lib asys
+
+-D skip_preprocess

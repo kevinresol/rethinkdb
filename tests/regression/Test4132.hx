@@ -11,7 +11,7 @@ using tink.CoreApi;
 		var tbl = r.db("test").table("tbl");
 		@:await assertAtom(true, r.and());
 		@:await assertAtom(false, r.or());
-		@:await assertAtom("nil", r.expr(false).or(nil));
+		@:await assertAtom(nil, r.expr(false).or(nil));
 		@:await dropTables(_tables);
 		return Noise;
 	}

@@ -1,0 +1,7 @@
+{'desc': 'Tests meta operations in composite queries',
+ 'tests': [{'ot': "({'dbs_created':3,'config_changes':arrlen(3)})",
+            'py': "r.expr([1,2,3]).for_each(r.db_create('db_' + r.row.coerce_to('string')))"},
+           {'ot': "partial({'tables_created':9})",
+            'py': 'r.db_list().set_difference(["rethinkdb", "test"]).for_each(lambda db_name:\nr.expr([1,2,3]).for_each(lambda i:\nr.db(db_name).table_create(\'tbl_\' + i.coerce_to(\'string\'))))'},
+           {'ot': "partial({'dbs_dropped':3,'tables_dropped':9})",
+            'py': 'r.db_list().set_difference(["rethinkdb", "test"]).for_each(r.db_drop(r.row))'}]}

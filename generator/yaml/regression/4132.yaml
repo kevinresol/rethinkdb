@@ -1,0 +1,7 @@
+{'desc': 'Regression tests for issue 4132',
+ 'table_variable_name': 'tbl',
+ 'tests': [{'cd': 'r.and()', 'ot': 'true', 'py': 'r.and_()'},
+           {'cd': 'r.or()', 'ot': 'false', 'py': 'r.or_()'},
+           {'cd': 'r.expr(false).or(nil)',
+            'ot': 'nil',
+            'py': 'r.expr(false).or_(nil)'}]}

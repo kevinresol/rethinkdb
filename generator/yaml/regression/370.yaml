@@ -1,0 +1,10 @@
+{'desc': 'Regression tests for issue #370, calling `map` after `db_list` or `table_list`',
+ 'tests': [{'cd': "r.db('test').table_create('t370')",
+            'def': "d = r.db('test')"},
+           {'cd': 'r.db_list().map(r.row)',
+            'ot': "(['rethinkdb', 'test'])",
+            'rb': 'r.db_list.map{|row| row}'},
+           {'cd': 'd.table_list().map(r.row)',
+            'ot': "(['t370'])",
+            'rb': 'd.table_list.map{|row| row}'},
+           {'cd': "r.db('test').table_drop('t370')"}]}

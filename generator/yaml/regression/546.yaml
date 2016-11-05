@@ -1,0 +1,10 @@
+{'desc': 'Regression tests for issue #546, variable shadowing',
+ 'tests': [{'js': 'r(1).do(function(a) { return a; })',
+            'ot': '1',
+            'py': 'r.expr(1).do(lambda a:a)'},
+           {'js': 'r(1).do(function(a) {\nreturn r(2).do(function(b) {\nreturn b;\n});\n})',
+            'ot': '2',
+            'py': 'r.expr(1).do(lambda a:r.expr(2).do(lambda b:b))'},
+           {'js': 'r(1).do(function(a) {\nreturn r(2).do(function(b) {\nreturn a;\n});\n})',
+            'ot': '1',
+            'py': 'r.expr(1).do(lambda a:r.expr(2).do(lambda b:a))'}]}

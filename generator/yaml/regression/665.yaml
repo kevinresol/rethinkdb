@@ -1,0 +1,6 @@
+{'desc': "Regression tests for issue #665.  Makes sharding not depend on operation's region.",
+ 'tests': [{'cd': "r.db('test').table_create('t665')",
+            'def': "t = r.db('test').table('t665')"},
+           {'cd': "t.insert([{'id':1}, {'id':4}])",
+            'ot': "({'unchanged':0,\n'skipped':0,\n'replaced':0,\n'inserted':2,\n'errors':0,\n'deleted':0\n})"},
+           {'cd': "r.db('test').table_drop('t665')"}]}

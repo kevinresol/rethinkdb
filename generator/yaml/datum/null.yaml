@@ -1,0 +1,9 @@
+{'desc': 'Tests of conversion to and from the RQL null type',
+ 'tests': [{'cd': ['r(null)', 'r.expr(null)'],
+            'ot': '(null)',
+            'py': 'r.expr(null)'},
+           {'cd': 'r.expr(null).type_of()',
+            'ot': "'NULL'",
+            'rb': 'r(null).type_of()'},
+           {'cd': "r.expr(null).coerce_to('string')", 'ot': "'null'"},
+           {'cd': "r.expr(null).coerce_to('null')", 'ot': 'null'}]}

@@ -3,11 +3,11 @@ package;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Printer;
-import yaml.Yaml;
-import yaml.Parser;
 
+using tink.CoreApi;
 using haxe.io.Path;
 using sys.io.File;
+using asys.io.Process;
 using sys.FileSystem;
 using StringTools;
 
@@ -15,39 +15,73 @@ class Main {
 	
 	static var root = '../../rethinkdb/test/rql_test/src';
 	static var tests = [];
+	static var hparser:hscript.Parser;
+	static var hinterp:hscript.Interp;
 	
 	static function main() {
 		
-		var start = haxe.Timer.stamp();
+		Future.ofMany(preprocess()).handle(function(_) {
+			var start = haxe.Timer.stamp();
+			
+			hparser = new hscript.Parser();
+			hparser.allowJSON = true;
+			hinterp = new hscript.Interp();
+			hinterp.variables.set('None', null);
+			
+			handleDirectory('');
+			
+			var main = '../tests/RunTests.hx';
+			var src = main.getContent().split('\n');
+			var s = -1, e = -1;
+			for(i in 0...src.length) {
+				var line = src[i];
+				if(line.indexOf('// >>>>') != -1) s = i;
+				if(line.indexOf('// <<<<') != -1) e = i;
+				if(s != -1 && e != -1) break;
+			}
+			
+			src.splice(s + 1, e - s - 1);
+			tests.sort(Reflect.compare);
+			for(i in 0...tests.length) {
+				src.insert(s + i + 1, '\t\t\tnew ' + tests[i] + '(conn),');
+			}
+			main.saveContent(src.join('\n'));
+			
+			var t = Std.int((haxe.Timer.stamp() - start) * 1000) / 1000;
+			trace('Generated ${tests.length} tests in ${t}s');
+		});
 		
-		handleDirectory('');
+	}
 		
-		var main = '../tests/RunTests.hx';
-		var src = main.getContent().split('\n');
-		var s = -1, e = -1;
-		for(i in 0...src.length) {
-			var line = src[i];
-			if(line.indexOf('// >>>>') != -1) s = i;
-			if(line.indexOf('// <<<<') != -1) e = i;
-			if(s != -1 && e != -1) break;
+	static function preprocess(path = '', ?futures:Array<Future<Noise>>) {
+		#if skip_preprocess return []; #end
+		
+		if(futures == null) futures = [];
+		for(p in ('$root/$path').readDirectory()) {
+			if('$root/$path/$p'.isDirectory()) preprocess('$path/$p', futures);
+			else {
+				var args = ['../../rethinkdb/test/common/parsePolyglot.py', '$root/$path/$p'];
+				trace(args);
+				var proc = new Process('python3', args);
+				futures.push(proc.stdout.all().map(function(b) {
+					if(!'./yaml/$path'.exists()) './yaml/$path'.createDirectory();
+					var content = b.sure().toString();
+					content = content.substr(content.indexOf('\n') + 1);
+					'./yaml/$path/$p'.saveContent(content);
+					return Noise;
+				}));
+			}
 		}
-		
-		src.splice(s + 1, e - s - 1);
-		tests.sort(Reflect.compare);
-		for(i in 0...tests.length) {
-			src.insert(s + i + 1, '\t\t\tnew ' + tests[i] + '(conn),');
-		}
-		main.saveContent(src.join('\n'));
-		
-		var t = Std.int((haxe.Timer.stamp() - start) * 1000) / 1000;
-		trace('Generated ${tests.length} tests in ${t}s');
+		return futures;
 	}
 		
 	static function handleDirectory(path:String) {
 		for(p in ('$root/$path').readDirectory()) {
 			if('$root/$path/$p'.isDirectory()) handleDirectory('$path/$p');
 			else if(p.indexOf('.') != p.lastIndexOf('.')) continue;
-			// else if(p != 'polymorphism.yaml') continue;
+			else if(p == 'range.yaml') continue; // skip this, did some manual changes
+			// else if(path.indexOf('datum') == -1) continue;
+			// else if(p != 'object.yaml') continue;
 			// else handleFile('$path/$p');
 			else try handleFile('$path/$p') catch(e:Dynamic) {
 				trace(e);
@@ -57,8 +91,8 @@ class Main {
 	
 	static function handleFile(path:String) {
 		trace('handling $path');
-		var yaml = '$root/$path'.getContent();
-		var tests = Yaml.parse(yaml, Parser.options().useObjects());
+		var yaml = 'yaml/$path'.getContent();
+		var tests = hinterp.execute(hparser.parseString(yaml));
 		var pack = path.substr(1).directory();
 		var filename = path.withoutDirectory().withoutExtension();
 		var name = 'Test' + filename.substr(0, 1).toUpperCase() + filename.substr(1);
@@ -77,20 +111,12 @@ class Main {
 			// if(exprs.length > 3) break;
 			var str:Dynamic = test.py == null ? test.cd : test.py;
 			
-			function isOutString(v:Dynamic) {
-				return Std.is(v, String) && (
-					(v:String).startsWith('err(') ||
-					(v:String).startsWith('err_regex(') ||
-					(v:String).startsWith('partial(') ||
-					(v:String).startsWith('bag(')
-				);
-			}
 			var out:String = 
 				if(!Reflect.hasField(test, 'ot')) null;
 				else if(test.ot == null) 'null';
-				else if(test.ot.py != null) isOutString(test.ot.py) ? test.ot.py : haxe.Json.stringify(test.ot.py); 
-				else if(test.ot.cd != null) isOutString(test.ot.cd) ? test.ot.cd : haxe.Json.stringify(test.ot.cd);
-				else isOutString(test.ot) ? test.ot : haxe.Json.stringify(test.ot);
+				else if(test.ot.py != null) test.ot.py; 
+				else if(test.ot.cd != null) test.ot.cd;
+				else test.ot;
 			if(out != null && out.startsWith('"(') && out.endsWith(')"')) out = out.substr(2, out.length - 4); 
 			if(out != null && out.startsWith('\\"') && out.endsWith('\\"')) out = out.substr(1, out.length - 3) + '"'; 
 			if(out != null && out.startsWith('\\\'') && out.endsWith('\\\'')) out = out.substr(1, out.length - 3) + "'"; 
@@ -115,7 +141,7 @@ class Main {
 							case {expr:ECall({expr: EConst(CIdent('bag'))}, p)}: macro assertBag(${p[0]}, $action);
 							case e: macro assertAtom($e, $action);
 						}
-						
+						// trace(out, new haxe.macro.Printer().printExpr(assert));
 						exprs.push(macro @:await $assert);
 					}
 					
@@ -188,3 +214,4 @@ class Main {
 		Main.tests.push('$folder/$name'.normalize().substr(9).replace('/', '.'));
 	}
 }
+

@@ -1,0 +1,7 @@
+{'desc': '4431 -- detect `use_outdated` optarg',
+ 'tests': [{'cd': "r.table('test')",
+            'ot': "err('ReqlQueryLogicError', 'The `use_outdated` optarg is no longer supported.  Use the `read_mode` optarg instead.')",
+            'runopts': {'use_outdated': 'true'}},
+           {'cd': "r.table('test', {use_outdated:true})",
+            'ot': "err('ReqlQueryLogicError', 'The `use_outdated` optarg is no longer supported.  Use the `read_mode` optarg instead.')",
+            'py': "r.table('test', use_outdated=True)"}]}

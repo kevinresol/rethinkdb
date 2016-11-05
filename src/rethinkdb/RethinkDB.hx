@@ -72,8 +72,16 @@ class RethinkDB {
 	public var row:Expr = TImplicitVar([]);
 	public inline function literal(v:Expr):Expr
 		return TLiteral([v]);
-	public inline function object(v:Exprs):Expr
-		return TObject([v]);
+	public inline function object(?e1:Expr, ?e2:Expr, ?e3:Expr, ?e4:Expr, ?e5:Expr):Expr
+		return TObject({
+			var args = [];
+			if(e1 != null) args.push(e1);
+			if(e2 != null) args.push(e2);
+			if(e3 != null) args.push(e3);
+			if(e4 != null) args.push(e4);
+			if(e5 != null) args.push(e5);
+			args;
+		});
 	
 	// Math and logic
 	public inline function add(v1:Expr, v2:Expr):Expr

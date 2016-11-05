@@ -1,0 +1,8 @@
+{'desc': "r.minval can't be confused with an empty array. This used to crash.",
+ 'table_variable_name': 'tbl',
+ 'tests': [{'ot': '{"created": 1}', 'py': 'tbl.index_create("v")'},
+           {'py': 'tbl.index_wait("v")'},
+           {'ot': 'partial({"inserted": 1})',
+            'py': 'tbl.insert({"id": 1, "v": []})'},
+           {'ot': '0',
+            'py': 'tbl.between([r.minval], [r.maxval], left_bound="open", index="v").count()'}]}

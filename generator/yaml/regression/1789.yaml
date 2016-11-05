@@ -1,0 +1,9 @@
+{'desc': '1789 -- deleting a secondary index on a table that contains non-inline stored documents corrupts db',
+ 'table_variable_name': 'tbl',
+ 'tests': [{'ot': "({'inserted':1})",
+            'rb': 'tbl.insert({:foo => \'a\', :data => "AAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}).pluck(\'inserted\')'},
+           {'ot': "({'created':1})", 'rb': "tbl.index_create('foo')"},
+           {'ot': "([{'index':'foo', 'ready':true}])",
+            'rb': "tbl.index_wait('foo').pluck('index', 'ready')"},
+           {'ot': "({'dropped':1})", 'rb': "tbl.index_drop('foo')"},
+           {'ot': '(1)', 'rb': "tbl.coerce_to('ARRAY').count()"}]}

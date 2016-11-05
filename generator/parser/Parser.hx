@@ -14,10 +14,11 @@ enum Token {
 	TColon;
 	TSemicolon;
 	TComma;
+	
 	TIn;
 	TFor;
-	
 	TLambda;
+	
 	TBinop(op:Binop);
 	
 	TNumber(v:String);
@@ -82,6 +83,8 @@ class Lexer extends hxparse.Lexer implements hxparse.RuleBuilder {
 		"\\." => TDot,
 		"for" => TFor,
 		"in" => TIn,
+		"True" => TIdent("true"),
+		"False" => TIdent("false"),
 		"lambda" => TLambda,
 		"-?(([1-9][0-9]*)|0)(\\.[0-9]+)?([eE][\\+\\-]?[0-9]?)?" => TNumber(lexer.current),
 		'"' => {
