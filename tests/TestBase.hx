@@ -126,6 +126,9 @@ class TestBase {
 			function(_) return Noise;
 	}
 	
+	inline function xrange(s:Int, ?e:Int) {
+		return e == null ? 0...s : s...e;
+	}
 	function arrlen(len:Int, other:Dynamic) {
 		return new ArrLen(len, other);
 	}

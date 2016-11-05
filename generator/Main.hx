@@ -47,7 +47,7 @@ class Main {
 		for(p in ('$root/$path').readDirectory()) {
 			if('$root/$path/$p'.isDirectory()) handleDirectory('$path/$p');
 			else if(p.indexOf('.') != p.lastIndexOf('.')) continue;
-			// else if(p != 'operations.yaml') continue;
+			// else if(p != 'polymorphism.yaml') continue;
 			// else handleFile('$path/$p');
 			else try handleFile('$path/$p') catch(e:Dynamic) {
 				trace(e);
@@ -95,7 +95,7 @@ class Main {
 			if(out != null && out.startsWith('\\"') && out.endsWith('\\"')) out = out.substr(1, out.length - 3) + '"'; 
 			if(out != null && out.startsWith('\\\'') && out.endsWith('\\\'')) out = out.substr(1, out.length - 3) + "'"; 
 			var def:String = test.def;
-			if(out == null) trace(test);
+			// if(out == null) trace(test);
 			if(str != null) {
 				try {
 					
@@ -122,8 +122,10 @@ class Main {
 					if(Std.is(str, Array)) for(s in (str:Array<String>)) add(s);
 					else add(str);
 					
+					// trace(str, new haxe.macro.Printer().printExpr(exprs[exprs.length - 1]));
+					
 				} catch(e:Dynamic) {
-					trace(out);
+					// trace(out);
 					trace(e);
 					// keep going
 				}

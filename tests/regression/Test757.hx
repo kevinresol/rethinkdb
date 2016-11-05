@@ -6,7 +6,6 @@ using tink.CoreApi;
 @:await class Test757 extends TestBase {
 	@:async
 	override function test() {
-		{ };
 		return Noise;
 	}
 }

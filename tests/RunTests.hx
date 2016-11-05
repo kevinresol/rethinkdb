@@ -18,8 +18,8 @@ class RunTests {
 		var tests = [
 			// >>>>
 			// new TestArity(conn),
-			// new TestDefault(conn),
-			// new TestMatch(conn),
+			new TestDefault(conn),
+			new TestMatch(conn),
 			new TestPolymorphism(conn),
 			// new TestRange(conn),
 			// new TestTimeout(conn),

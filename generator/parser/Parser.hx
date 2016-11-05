@@ -14,6 +14,8 @@ enum Token {
 	TColon;
 	TSemicolon;
 	TComma;
+	TIn;
+	TFor;
 	
 	TLambda;
 	TBinop(op:Binop);
@@ -32,6 +34,7 @@ enum Binop {
 	OpMul;
 	OpMod;
 	OpAssign;
+	OpInterval;
 }
 
 enum Expr {
@@ -46,6 +49,8 @@ enum Expr {
 	EParenthesis(e:Expr);
 	EBlock(e:Array<Expr>);
 	EReturn(e:Expr);
+	EFor(it:Expr, e:Expr);
+	EIn(e1:Expr, e2:Expr);
 }
 
 enum Const {
@@ -75,6 +80,8 @@ class Lexer extends hxparse.Lexer implements hxparse.RuleBuilder {
 		";" => TSemicolon,
 		":" => TColon,
 		"\\." => TDot,
+		"for" => TFor,
+		"in" => TIn,
 		"lambda" => TLambda,
 		"-?(([1-9][0-9]*)|0)(\\.[0-9]+)?([eE][\\+\\-]?[0-9]?)?" => TNumber(lexer.current),
 		'"' => {
@@ -156,7 +163,7 @@ class Parser extends hxparse.Parser<hxparse.LexerTokenSource<Token>, Token> impl
 			case [TString(v)]: next(EConst(CString(v)));
 			case [TIdent(i)]: next(EConst(CIdent(i)));
 			case [TNumber(i)]: next(EConst(CFloat(i)));
-			case [TBkOpen, a = params(), TBkClose]: next(EArrayDecl(a));
+			case [TBkOpen, a = arrDecl(), TBkClose]: next(EArrayDecl(a));
 			case [TBrOpen, e = block(), TBrClose]:
 				switch e {
 					case EObjectDecl(_): next(e);
@@ -272,6 +279,23 @@ class Parser extends hxparse.Parser<hxparse.LexerTokenSource<Token>, Token> impl
 		return ret;
 	}
 	
+	function arrDecl() {
+		var ret = [];
+		switch stream {
+			case [e = expr()]: ret.push(e);
+			case _: return [];
+		}
+		while(true) {
+			switch stream {
+				case [TFor, i = expr(), TIn, e = expr()]: 
+					return [EFor(EIn(i, e), ret[0])];
+				case [TComma, e = expr()]: ret.push(e);
+				case _: break;
+			}
+		}
+		return ret;
+	}
+	
 	function params() {
 		var ret = [];
 		switch stream {
@@ -302,6 +326,8 @@ class Printer {
 			case EArrayAccess(e, e1): print(e) + '[' + print(e1) + ']';
 			case EBlock(exprs): '{' + [for(e in exprs) print(e) + ';'].join(' ') + '}';
 			case EReturn(e): 'return ' + print(e);
+			case EFor(it, e): 'for(' + print(it) + ') ' + print(e);
+			case EIn(e1, e2): print(e1) + ' in ' + print(e2);
 		}
 	}
 	
@@ -319,6 +345,7 @@ class Printer {
 			case OpMul: ' / ';
 			case OpMod: ' % ';
 			case OpAssign: ' = ';
+			case OpInterval: '...';
 		}
 }
 
@@ -359,6 +386,7 @@ class Mapper {
 				case OpMul: OpMult;
 				case OpMod: OpMod;
 				case OpAssign: OpAssign;
+				case OpInterval: OpInterval;
 			}, map(e1), map(e2));
 			case ELambda(args, e): ExprDef.EFunction(null, {
 					args: args.map(function(a) return {name: a, meta: null, opt: null, type: null, value: null}),
@@ -371,6 +399,8 @@ class Mapper {
 			case EArrayAccess(e, e1): ExprDef.EArray(map(e), map(e1));
 			case EBlock(exprs): ExprDef.EBlock(exprs.map(map));
 			case EReturn(e): ExprDef.EReturn(map(e));
+			case EFor(it, e): ExprDef.EFor(map(it), map(e));
+			case EIn(e1, e2): ExprDef.EIn(map(e1), map(e2));
 		}
 		return {expr: def, pos: null}
 	}
