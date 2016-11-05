@@ -83,12 +83,12 @@ class Response {
 	public function asCursor<T>():Outcome<Cursor<T>, Error>
 		return switch type {
 			case SUCCESS_SEQUENCE | SUCCESS_PARTIAL: Success(new Cursor(this, connection, query));
-			default: Failure(Error.withData('Error', ReqlDriverError('Invalid cast', query.term, [])));
+			default: Failure(Error.withData('Cannot cast to Cursor', ReqlDriverError('Invalid cast', query.term, [])));
 		}
 		
 	public function asAtom<T>():Outcome<Atom<T>, Error>
 		return switch type {
 			case SUCCESS_ATOM | SERVER_INFO: Success(response[0]); 
-			default: Failure(Error.withData('Error', ReqlDriverError('Invalid cast', query.term, [])));
+			default: trace(this); Failure(Error.withData('Cannot cast to Atom', ReqlDriverError('Invalid cast', query.term, [])));
 		}
 }

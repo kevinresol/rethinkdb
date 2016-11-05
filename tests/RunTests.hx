@@ -21,7 +21,7 @@ class RunTests {
 			new TestDefault(conn),
 			new TestMatch(conn),
 			new TestPolymorphism(conn),
-			// new TestRange(conn),
+			new TestRange(conn),
 			// new TestTimeout(conn),
 			// new changefeeds.TestIdxcopy(conn),
 			// new changefeeds.TestSindex(conn),

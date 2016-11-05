@@ -66,13 +66,14 @@ class TestBase {
 	function assertBag(v:Array<Dynamic>, e:Expr, ?pos:haxe.PosInfos) {
 		var f = e.run(conn).asCursor().flatMap(function(o) return switch o {
 			case Success(cur):
-				cur.toArray().map(function(arr) return try {
-					compare(v, arr);
-					Success(Noise); 
-				} catch(err:String) {
-					trace('Expected $v, got $arr');
-					Failure(new Error(err, pos));
-				});
+				cur.toArray() >> 
+					function(arr:Array<Dynamic>) return try {
+						compare(v, arr);
+						Success(Noise); 
+					} catch(err:String) {
+						trace('Expected $v, got $arr');
+						Failure(new Error(err, pos));
+					}
 			case Failure(f): Future.sync(Failure(new Error('Unexpected error $f', pos)));
 		});
 		
@@ -109,6 +110,24 @@ class TestBase {
 					throw e;
 				}
 				compare(message, (err.getParameters()[0]:String).split('\n')[0]);
+				Success(Noise);
+			} catch(err:String) Failure(new Error(err, pos));
+		});
+		
+		return handle(f);
+	}
+	
+	function assertErrorRegex(errName:String, regex:String, e:Expr, ?pos:haxe.PosInfos) {
+		var f = e.run(conn).asAtom().map(function(o) return switch o {
+			case Success(_): Failure(new Error("Unexpected failure", pos));
+			case Failure(f): try {
+				var err:ReqlError = f.data;
+				var message:String = err.getParameters()[0];
+				try compare(errName, err.getName()) catch(e:Dynamic) {
+					trace('Expected $errName, got ' +  err.getName() + ' - $message');
+					throw e;
+				}
+				if(!new EReg(regex, '').match(message)) throw 'Expected regex $regex but got $message';	
 				Success(Noise);
 			} catch(err:String) Failure(new Error(err, pos));
 		});
