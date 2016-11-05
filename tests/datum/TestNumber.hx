@@ -19,9 +19,9 @@ using tink.CoreApi;
 		@:await assertAtom("NUMBER", r.expr(1).typeOf());
 		@:await assertAtom("1", r.expr(1).coerceTo("string"));
 		@:await assertAtom(1, r.expr(1).coerceTo("number"));
-		@:await assertAtom(int_cmp(1), r.expr(1.0));
-		@:await assertAtom(int_cmp(45), r.expr(45));
-		@:await assertAtom(float_cmp(1.2), r.expr(1.2));
+		@:await assertAtom(1, r.expr(1.0));
+		@:await assertAtom(45, r.expr(45));
+		@:await assertAtom(1.2, r.expr(1.2));
 		return Noise;
 	}
 }
