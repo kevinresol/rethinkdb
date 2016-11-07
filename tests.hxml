@@ -4,6 +4,6 @@
 
 -lib tink_macro
 -lib yaml
--lib deep-equal
 -lib hxparse
 -lib tink_await
+-lib deep_equal

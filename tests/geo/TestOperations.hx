@@ -32,14 +32,14 @@ using tink.CoreApi;
 		@:await assertAtom(false, r.circle([0, 0], 1, { "fill" : false }).eq(r.circle([0, 0], 1, { "fill" : true })));
 		@:await assertAtom(true, r.circle([0, 0], 1, { "fill" : false }).fill().eq(r.circle([0, 0], 1, { "fill" : true })));
 		@:await assertAtom(({ "$reql_type$" : "GEOMETRY", "coordinates" : [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]], [[0.1, 0.1], [0.9, 0.1], [0.9, 0.9], [0.1, 0.9], [0.1, 0.1]]], "type" : "Polygon" }), r.polygon([0, 0], [1, 0], [1, 1], [0, 1]).polygonSub(r.polygon([0.1, 0.1], [0.9, 0.1], [0.9, 0.9], [0.1, 0.9])));
-		@:await assertError("ReqlQueryLogicError", "The second argument to `polygon_sub` is not contained in the first one.", r.polygon([0, 0], [1, 0], [1, 1], [0, 1]).polygonSub(r.polygon([0.1, 0.9], [0.9, 0.0], [0.9, 0.9], [0.1, 0.9])));
-		@:await assertError("ReqlQueryLogicError", "The second argument to `polygon_sub` is not contained in the first one.", r.polygon([0, 0], [1, 0], [1, 1], [0, 1]).polygonSub(r.polygon([0, 0], [2, 0], [2, 2], [0, 2])));
-		@:await assertError("ReqlQueryLogicError", "The second argument to `polygon_sub` is not contained in the first one.", r.polygon([0, 0], [1, 0], [1, 1], [0, 1]).polygonSub(r.polygon([0, -2], [1, -2], [-1, 1], [0, -1])));
-		@:await assertError("ReqlQueryLogicError", "The second argument to `polygon_sub` is not contained in the first one.", r.polygon([0, 0], [1, 0], [1, 1], [0, 1]).polygonSub(r.polygon([0, -1], [1, -1], [1, 0], [0, 0])));
-		@:await assertError("ReqlQueryLogicError", "The second argument to `polygon_sub` is not contained in the first one.", r.polygon([0, 0], [1, 0], [1, 1], [0, 1]).polygonSub(r.polygon([0.1, -1], [0.9, -1], [0.9, 0.5], [0.1, 0.5])));
+		@:await assertError(err("ReqlQueryLogicError", "The second argument to `polygon_sub` is not contained in the first one.", [0]), r.polygon([0, 0], [1, 0], [1, 1], [0, 1]).polygonSub(r.polygon([0.1, 0.9], [0.9, 0.0], [0.9, 0.9], [0.1, 0.9])));
+		@:await assertError(err("ReqlQueryLogicError", "The second argument to `polygon_sub` is not contained in the first one.", [0]), r.polygon([0, 0], [1, 0], [1, 1], [0, 1]).polygonSub(r.polygon([0, 0], [2, 0], [2, 2], [0, 2])));
+		@:await assertError(err("ReqlQueryLogicError", "The second argument to `polygon_sub` is not contained in the first one.", [0]), r.polygon([0, 0], [1, 0], [1, 1], [0, 1]).polygonSub(r.polygon([0, -2], [1, -2], [-1, 1], [0, -1])));
+		@:await assertError(err("ReqlQueryLogicError", "The second argument to `polygon_sub` is not contained in the first one.", [0]), r.polygon([0, 0], [1, 0], [1, 1], [0, 1]).polygonSub(r.polygon([0, -1], [1, -1], [1, 0], [0, 0])));
+		@:await assertError(err("ReqlQueryLogicError", "The second argument to `polygon_sub` is not contained in the first one.", [0]), r.polygon([0, 0], [1, 0], [1, 1], [0, 1]).polygonSub(r.polygon([0.1, -1], [0.9, -1], [0.9, 0.5], [0.1, 0.5])));
 		@:await assertAtom(({ "$reql_type$" : "GEOMETRY", "coordinates" : [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]], [[0, 0], [0.1, 0.9], [0.9, 0.9], [0.9, 0.1], [0, 0]]], "type" : "Polygon" }), r.polygon([0, 0], [1, 0], [1, 1], [0, 1]).polygonSub(r.polygon([0, 0], [0.1, 0.9], [0.9, 0.9], [0.9, 0.1])));
-		@:await assertError("ReqlQueryLogicError", "Expected a Polygon with only an outer shell.  This one has holes.", r.polygon([0, 0], [1, 0], [1, 1], [0, 1]).polygonSub(r.polygon([0, 0], [0.1, 0.9], [0.9, 0.9], [0.9, 0.1]).polygonSub(r.polygon([0.2, 0.2], [0.5, 0.8], [0.8, 0.2]))));
-		@:await assertError("ReqlQueryLogicError", "Expected a Polygon but found a LineString.", r.polygon([0, 0], [1, 0], [1, 1], [0, 1]).polygonSub(r.line([0, 0], [0.9, 0.1], [0.9, 0.9], [0.1, 0.9])));
+		@:await assertError(err("ReqlQueryLogicError", "Expected a Polygon with only an outer shell.  This one has holes.", [0]), r.polygon([0, 0], [1, 0], [1, 1], [0, 1]).polygonSub(r.polygon([0, 0], [0.1, 0.9], [0.9, 0.9], [0.9, 0.1]).polygonSub(r.polygon([0.2, 0.2], [0.5, 0.8], [0.8, 0.2]))));
+		@:await assertError(err("ReqlQueryLogicError", "Expected a Polygon but found a LineString.", []), r.polygon([0, 0], [1, 0], [1, 1], [0, 1]).polygonSub(r.line([0, 0], [0.9, 0.1], [0.9, 0.9], [0.1, 0.9])));
 		return Noise;
 	}
 }

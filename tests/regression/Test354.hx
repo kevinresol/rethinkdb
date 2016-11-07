@@ -8,10 +8,10 @@ using tink.CoreApi;
 	override function test() {
 		var arr = r.expr([1, 2, 3, 4, 5]);
 		@:await assertAtom([3, 4, 5], arr.skip(2));
-		@:await assertError("ReqlQueryLogicError", "Expected type NUMBER but found STRING.", arr.skip("a"));
-		@:await assertError("ReqlQueryLogicError", "Expected type NUMBER but found ARRAY.", arr.skip([1, 2, 3]));
-		@:await assertError("ReqlQueryLogicError", "Expected type NUMBER but found OBJECT.", arr.skip({  }).count());
-		@:await assertError("ReqlNonExistenceError", "Expected type NUMBER but found NULL.", arr.skip(null));
+		@:await assertError(err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.", [1]), arr.skip("a"));
+		@:await assertError(err("ReqlQueryLogicError", "Expected type NUMBER but found ARRAY.", [1]), arr.skip([1, 2, 3]));
+		@:await assertError(err("ReqlQueryLogicError", "Expected type NUMBER but found OBJECT.", [0, 1]), arr.skip({  }).count());
+		@:await assertError(err("ReqlNonExistenceError", "Expected type NUMBER but found NULL.", [1]), arr.skip(null));
 		return Noise;
 	}
 }

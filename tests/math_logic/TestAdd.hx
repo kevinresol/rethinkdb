@@ -15,9 +15,9 @@ using tink.CoreApi;
 		@:await assertAtom("", r.expr("") + "");
 		@:await assertAtom("abcdef", r.expr("abc") + "def");
 		@:await assertAtom([1, 2, 3, 4, 5, 6, 7, 8], r.expr([1, 2]) + [3] + [4, 5] + [6, 7, 8]);
-		@:await assertError("ReqlQueryLogicError", "Expected type NUMBER but found STRING.", r.expr(1) + "a");
-		@:await assertError("ReqlQueryLogicError", "Expected type STRING but found NUMBER.", r.expr("a") + 1);
-		@:await assertError("ReqlQueryLogicError", "Expected type ARRAY but found NUMBER.", r.expr([]) + 1);
+		@:await assertError(err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.", [1]), r.expr(1) + "a");
+		@:await assertError(err("ReqlQueryLogicError", "Expected type STRING but found NUMBER.", [1]), r.expr("a") + 1);
+		@:await assertError(err("ReqlQueryLogicError", "Expected type ARRAY but found NUMBER.", [1]), r.expr([]) + 1);
 		return Noise;
 	}
 }

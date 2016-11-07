@@ -12,16 +12,23 @@ using tink.CoreApi;
 @:await
 class RunTests {
 	
-	@:await static function main() {
+	static function main() {
+		run().handle(function(o) switch o {
+			case Success(e): Sys.exit(e);
+			case Failure(e): trace('Unexpected error: $e'); Sys.exit(1);
+		});
+	}
+		
+	@:async static function run() {
 		
 		var conn = r.connect();
 		var tests = [
 			// >>>>
 			// new TestArity(conn),
 			// new TestControl(conn),
-			// new TestDefault(conn),
-			// new TestMatch(conn),
-			// new TestPolymorphism(conn),
+			new TestDefault(conn),
+			new TestMatch(conn),
+			new TestPolymorphism(conn),
 			// new TestSelection(conn),
 			// new TestTimeout(conn),
 			// new changefeeds.TestIdxcopy(conn),
@@ -33,7 +40,6 @@ class RunTests {
 			// new datum.TestArray(conn),
 			// new datum.TestBool(conn),
 			// new datum.TestNull(conn),
-			// new datum.TestNumber(conn),
 			// new datum.TestObject(conn),
 			// new datum.TestTypeof(conn),
 			// new datum.TestUuid(conn),
@@ -52,7 +58,7 @@ class RunTests {
 			// new math_logic.TestMod(conn),
 			// new math_logic.TestMul(conn),
 			// new math_logic.TestSub(conn),
-			new meta.TestDbs(conn),
+			// new meta.TestDbs(conn),
 			// new meta.TestGrant(conn),
 			// new meta.TestTable(conn),
 			// new mutation.TestAtomic_get_set(conn),
@@ -66,6 +72,7 @@ class RunTests {
 			// new regression.Test1005(conn),
 			// new regression.Test1081(conn),
 			// new regression.Test1132(conn),
+			// new regression.Test1133(conn),
 			// new regression.Test1155(conn),
 			// new regression.Test1179(conn),
 			// new regression.Test1468(conn),
@@ -139,6 +146,6 @@ class RunTests {
 		}
 		trace('$total Tests : ${errors.length} Errors');
 		if(errors.length > 0) for(e in errors) trace(e);
-		Sys.exit(errors.length);
+		return errors.length;
 	}
 }

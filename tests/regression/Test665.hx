@@ -8,6 +8,7 @@ using tink.CoreApi;
 	override function test() {
 		var t = r.db("test").table("t665");
 		@:await assertAtom(({ "unchanged" : 0, "skipped" : 0, "replaced" : 0, "inserted" : 2, "errors" : 0, "deleted" : 0 }), t.insert([{ "id" : 1 }, { "id" : 4 }]));
+		r.db("test").tableDrop("t665");
 		return Noise;
 	}
 }

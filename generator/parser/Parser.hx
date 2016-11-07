@@ -395,9 +395,9 @@ class Mapper {
 				case OpInterval: OpInterval;
 			}, map(e1), map(e2));
 			case ELambda(args, e): ExprDef.EFunction(null, {
-					args: args.map(function(a) return {name: a, meta: null, opt: null, type: null, value: null}),
+					args: args.map(function(a) return {name: a, meta: null, opt: null, type: macro:Expr, value: null}),
 					expr: map(e),
-					ret: null,
+					ret: macro:Expr,
 				});
 			case EObjectDecl(fields): ExprDef.EObjectDecl(fields.map(function(f) return {field: f.field, expr: map(f.expr)}));
 			case EArrayDecl(fields): ExprDef.EArrayDecl(fields.map(map));

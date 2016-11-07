@@ -10,8 +10,8 @@ using tink.CoreApi;
 		@:await createTables(_tables);
 		var tbl = r.db("test").table("tbl");
 		@:await assertAtom(partial({ "inserted" : 2 }), tbl.insert([{ "id" : 0, "a" : 5 }, { "id" : 1, "a" : 6 }]));
-		@:await assertAtom(({ "a" : 11 }), tbl.reduce(function(x, y) return r.object("a", r.add(x["a"], y["a"]))));
-		@:await assertError("ReqlQueryLogicError", "Cannot convert NUMBER to SEQUENCE", tbl.reduce(function(x, y) return r.expr(0)[0]));
+		@:await assertAtom(({ "a" : 11 }), tbl.reduce(function(x:Expr, y:Expr):Expr return r.object("a", r.add(x["a"], y["a"]))));
+		@:await assertError(err("ReqlQueryLogicError", "Cannot convert NUMBER to SEQUENCE"), tbl.reduce(function(x:Expr, y:Expr):Expr return r.expr(0)[0]));
 		@:await dropTables(_tables);
 		return Noise;
 	}

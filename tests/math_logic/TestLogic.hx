@@ -14,7 +14,7 @@ using tink.CoreApi;
 		@:await assertAtom(false, r.or(false, false, false, false, false));
 		@:await assertAtom(true, r.or(false, false, false, true, false));
 		@:await assertAtom(true, r.or(false, true, false, true, false));
-		@:await assertError("ReqlQueryLogicError", "Cannot perform bracket on a non-object non-sequence `\"a\"`.", r.expr(r.expr("a")["b"]).default_(2));
+		@:await assertError(err("ReqlQueryLogicError", "Cannot perform bracket on a non-object non-sequence `\"a\"`.", []), r.expr(r.expr("a")["b"]).default_(2));
 		return Noise;
 	}
 }

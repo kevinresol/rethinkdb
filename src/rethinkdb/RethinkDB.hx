@@ -214,8 +214,15 @@ class RethinkDB {
 			if(e5 != null) args.unshift(e5);
 			args;
 		});
-	public inline function branch(v:Expr, t:Expr, f:Expr):Expr
-		return TBranch([v, t, f]);
+	public inline function branch(e1:Expr, e2:Expr, e3:Expr, ?e4:Expr, ?e5:Expr, ?e6:Expr, ?e7:Expr):Expr
+		return TBranch({
+			var args = [e1, e2, e3];
+			if(e5 != null) args.push(e4);
+			if(e5 != null) args.push(e5);
+			if(e6 != null) args.push(e6);
+			if(e7 != null) args.push(e7);
+			args;
+		});
 	public inline function range(?start:Expr, ?end:Expr):Expr
 		return TRange({
 			var args = [];

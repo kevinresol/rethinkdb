@@ -9,6 +9,7 @@ using tink.CoreApi;
 		var d = r.db("test");
 		@:await assertAtom((["rethinkdb", "test"]), r.dbList().map(r.row));
 		@:await assertAtom((["t370"]), d.tableList().map(r.row));
+		r.db("test").tableDrop("t370");
 		return Noise;
 	}
 }

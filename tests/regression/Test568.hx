@@ -9,7 +9,8 @@ using tink.CoreApi;
 		var _tables = ["tbl"];
 		@:await createTables(_tables);
 		var tbl = r.db("test").table("tbl");
-		@:await assertError("ReqlQueryLogicError", "Cannot convert STRING to SEQUENCE", tbl.concatMap(function(rec) return rec["name"]));
+		tbl.insert({ "name" : "Jim Brown" });
+		@:await assertError(err("ReqlQueryLogicError", "Cannot convert STRING to SEQUENCE", []), tbl.concatMap(function(rec:Expr):Expr return rec["name"]));
 		@:await dropTables(_tables);
 		return Noise;
 	}

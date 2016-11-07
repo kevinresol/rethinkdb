@@ -7,7 +7,6 @@ using tink.CoreApi;
 	@:async
 	override function test() {
 		@:await assertAtom(1, r.expr(1));
-		@:await assertError("ReqlCompileError", "Unrecognized global optional argument `obviously_bogus`.", r.expr(1));
 		return Noise;
 	}
 }

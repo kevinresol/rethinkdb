@@ -54,13 +54,14 @@ abstract Expr(Term) from Term to Term {
 		return connection.query(query);
 	}
 	
-	@:from
-	public static inline function ofFunc0(f:Void->Expr):Expr
-		return f();
-		
-	@:from
-	public static inline function ofFunc1Opt(f:?Expr->Expr):Expr
-		return f(null);
+	@:from public static inline function ofFunc0(f:Void->Expr):Expr return f();
+	@:from public static inline function ofFunc0String(f:Void->String):Expr return f();
+	@:from public static inline function ofFunc0Int(f:Void->Int):Expr return f();
+	@:from public static inline function ofFunc0Float(f:Void->Float):Expr return f();
+	@:from public static inline function ofFunc0Bool(f:Void->Bool):Expr return f();
+	
+	@:from public static inline function ofFunc1Opt(f:?Expr->Expr):Expr return f(null);
+	
 	
 	@:from
 	public static function ofFunc1(f:Expr->Expr):Expr {
@@ -87,6 +88,10 @@ abstract Expr(Term) from Term to Term {
 		return TFunc([TMakeArray(argNums), f(var1, var2, var3)]);
 	}
 	
+	// @:from
+	// public static function ofDynFunc1(f:Dynamic->Dynamic):Expr 
+	// 	return ofFunc1(f);
+	
 	@:from public static inline function ofStrings(v:Array<String>):Expr return TMakeArray([for(i in v) (i:Expr)]);
 	@:from public static inline function ofInts(v:Array<Int>):Expr return TMakeArray([for(i in v) (i:Expr)]);
 	@:from public static inline function ofFloats(v:Array<Float>):Expr return TMakeArray([for(i in v) (i:Expr)]);
@@ -97,7 +102,7 @@ abstract Expr(Term) from Term to Term {
 	@:from public static inline function ofBool(v:Bool):Expr return TDatum(DBool(v));
 	@:from public static inline function ofObject(v:{}):Expr return TDatum(DatumTools.ofAny(v));
 	@:from public static inline function ofTerm(v:Term):Expr return v;
-	@:from public static inline function ofAny(v:Dynamic):Expr return TDatum(DatumTools.ofAny(v));
+	// @:from public static inline function ofAny(v:Dynamic):Expr return TDatum(DatumTools.ofAny(v));
 		
 	@:op(A+B) public inline function opAdd(b:Expr):Expr return add(b);
 	@:op(A-B) public inline function opSub(b:Expr):Expr return sub(b);
@@ -143,8 +148,8 @@ abstract Expr(Term) from Term to Term {
 	// Selecting data
 	public inline function between(lower:Expr, upper:Expr):Expr
 		return TBetween([this, lower, upper]);
-	public inline function filter(f:Expr->Expr, ?opt:Options):Expr
-		return TFilter([this, (f:Expr)], opt);
+	public inline function filter(f:Expr, ?opt:Options):Expr
+		return TFilter([this, f], opt);
 	
 	// Joins
 	public inline function innerJoin(v:Expr, f:Expr->Expr->Expr):Expr
@@ -157,8 +162,8 @@ abstract Expr(Term) from Term to Term {
 		return TZip([this]);
 	
 	// Transformation
-	public inline function map(f:Expr->Expr):Expr
-		return TMap([this, (f:Expr)]);
+	public inline function map(f:Expr):Expr
+		return TMap([this, f]);
 		
 	public inline function withFields(v1:Expr, ?v2:Expr, ?v3:Expr, ?v4:Expr, ?v5:Expr):Expr
 		return TWithFields({
@@ -421,8 +426,8 @@ abstract Expr(Term) from Term to Term {
 		});
 	public inline function branch(ifTrue:Expr, ifFalse:Expr):Expr
 		return TBranch([this, ifTrue, ifFalse]);
-	public inline function forEach(f:Expr->Expr):Expr
-		return TForEach([this, (f:Expr)]);
+	public inline function forEach(f:Expr):Expr
+		return TForEach([this, f]);
 	public inline function default_(v:Expr):Expr // TODO: function form
 		return TDefault([this, v]);
 	public inline function coerceTo(v:Expr):Expr // TODO: figure this out...

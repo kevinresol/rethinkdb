@@ -16,9 +16,9 @@ using tink.CoreApi;
 		@:await assertAtom(partial({ "dbs_dropped" : 1 }), r.dbDrop("a"));
 		@:await assertAtom(bag(["rethinkdb", "test"]), r.dbList());
 		@:await assertAtom(partial({ "dbs_created" : 1 }), r.dbCreate("bar"));
-		@:await assertError("ReqlOpFailedError", "Database `bar` already exists.", r.dbCreate("bar"));
+		@:await assertError(err("ReqlOpFailedError", "Database `bar` already exists.", [0]), r.dbCreate("bar"));
 		@:await assertAtom(partial({ "dbs_dropped" : 1 }), r.dbDrop("bar"));
-		@:await assertError("ReqlOpFailedError", "Database `bar` does not exist.", r.dbDrop("bar"));
+		@:await assertError(err("ReqlOpFailedError", "Database `bar` does not exist.", [0]), r.dbDrop("bar"));
 		return Noise;
 	}
 }

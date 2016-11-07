@@ -56,8 +56,8 @@ using tink.CoreApi;
 		@:await assertAtom(false, r.polygon([1, 1], [2, 1], [2, 2], [1, 2]).includes(r.polygon([2, 1.1], [3, 1.1], [3, 1.9], [2, 1.9])));
 		@:await assertAtom(false, r.polygon([1, 1], [2, 1], [2, 2], [1, 2]).includes(r.polygon([2, 2], [3, 2], [3, 3], [2, 3])));
 		@:await assertAtom(1, r.expr([r.polygon([0, 0], [1, 1], [1, 0]), r.polygon([0, 1], [1, 2], [1, 1])]).includes(r.point(0, 0)).count());
-		@:await assertError("ReqlQueryLogicError", "Expected geometry of type `Polygon` but found `Point`.", r.point(0, 0).includes(r.point(0, 0)));
-		@:await assertError("ReqlQueryLogicError", "Expected geometry of type `Polygon` but found `LineString`.", r.line([0, 0], [0, 1]).includes(r.point(0, 0)));
+		@:await assertError(err("ReqlQueryLogicError", "Expected geometry of type `Polygon` but found `Point`."), r.point(0, 0).includes(r.point(0, 0)));
+		@:await assertError(err("ReqlQueryLogicError", "Expected geometry of type `Polygon` but found `LineString`."), r.line([0, 0], [0, 1]).includes(r.point(0, 0)));
 		return Noise;
 	}
 }

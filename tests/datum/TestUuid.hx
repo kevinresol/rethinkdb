@@ -13,7 +13,7 @@ using tink.CoreApi;
 		@:await assertAtom(("97dd10a5-4fc4-554f-86c5-0d2c2e3d5330"), r.uuid("magic"));
 		@:await assertAtom(true, r.uuid("magic").eq(r.uuid("magic")));
 		@:await assertAtom(true, r.uuid("magic").ne(r.uuid("beans")));
-		@:await assertAtom(10, r.expr([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).map(function(u) return r.uuid()).distinct().count());
+		@:await assertAtom(10, r.expr([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).map(function(u:Expr):Expr return r.uuid()).distinct().count());
 		return Noise;
 	}
 }

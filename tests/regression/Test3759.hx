@@ -9,10 +9,10 @@ using tink.CoreApi;
 		var _tables = ["tbl"];
 		@:await createTables(_tables);
 		var tbl = r.db("test").table("tbl");
-		@:await assertAtom([1], r.db("rethinkdb").table("jobs").map(function() return 1));
-		@:await assertAtom(null, r.db("rethinkdb").table("jobs").map(function() return 1));
-		@:await assertAtom(null, r.db("rethinkdb").table("jobs").map(function() return 1));
-		@:await assertAtom([1], r.db("rethinkdb").table("jobs").map(function() return 1));
+		@:await assertAtom([1], r.db("rethinkdb").table("jobs").map(function():Expr return 1));
+		@:await assertAtom(null, r.db("rethinkdb").table("jobs").map(function():Expr return 1));
+		@:await assertAtom(null, r.db("rethinkdb").table("jobs").map(function():Expr return 1));
+		@:await assertAtom([1], r.db("rethinkdb").table("jobs").map(function():Expr return 1));
 		@:await dropTables(_tables);
 		return Noise;
 	}

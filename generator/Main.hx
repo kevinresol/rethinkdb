@@ -121,7 +121,10 @@ class Main {
 			if(out != null && out.startsWith('\\"') && out.endsWith('\\"')) out = out.substr(1, out.length - 3) + '"'; 
 			if(out != null && out.startsWith('\\\'') && out.endsWith('\\\'')) out = out.substr(1, out.length - 3) + "'"; 
 			var def:String = test.def;
-			// if(out == null) trace(test);
+			if(out == null && def == null) {
+				def = str;
+				str = null;
+			}
 			if(str != null) {
 				try {
 					
@@ -134,11 +137,11 @@ class Main {
 						var parser = new parser.Parser(byte.ByteData.ofString(out), 'test');
 						var expr = parser.parse();
 						var parsed = printer.print(expr);
-						var assert = switch mapper.map(expr) {
-							case {expr:ECall({expr: EConst(CIdent('err'))}, p)}: macro assertError(${p[0]}, ${p[1]}, $action);
-							case {expr:ECall({expr: EConst(CIdent('err_regex'))}, p)}: macro assertErrorRegex(${p[0]}, ${p[1]}, $action);
-							case {expr:ECall({expr: EConst(CIdent('int_cmp'))}, p)}: macro assertAtom(${p[0]}, $action);
-							case {expr:ECall({expr: EConst(CIdent('float_cmp'))}, p)}: macro assertAtom(${p[0]}, $action);
+						var e = mapper.map(expr);
+						var assert = switch e {
+							case {expr:ECall({expr: EConst(CIdent('err' | 'err_regex'))}, p)}: 
+								if(p[0].expr.match(EConst(CString("ReqlCompileError")))) return; // skip local compile error for now
+								macro assertError($e, $action);
 							case e: macro assertAtom($e, $action);
 						}
 						// trace(out, new haxe.macro.Printer().printExpr(assert));
@@ -166,7 +169,7 @@ class Main {
 						name: name,
 						type: null,
 					}]);
-					default: throw 'unhandled def: $def';
+					case e: e;
 				}
 				exprs.push({expr: defExpr, pos: null});
 			}
