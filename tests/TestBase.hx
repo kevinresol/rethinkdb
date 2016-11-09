@@ -62,33 +62,34 @@ class TestBase {
 			function(_) return Noise;
 	}
 	
-	inline function xrange(s:Int, ?e:Int) {
+	
+	inline function xrange(s:Int, ?e:Int)
 		return e == null ? 0...s : s...e;
-	}
-	function arrlen(len:Int, other:Dynamic) {
+	
+	function arrlen(len:Int, other:Dynamic)
 		return [for(i in 0...len) other];
-	}
-	function uuid() {
+	
+	function uuid()
 		return new Uuid();
-	}
-	function bag(items:Array<Dynamic>) {
+	
+	function bag(items:Array<Dynamic>)
 		return new ArrayContains(items);
-	}
-	function partial(obj:{}) {
+	
+	function partial(obj:{})
 		return new ObjectContains(obj);
-	}
-	function err(name:String, message:String, f:Array<Dynamic>) {
+	
+	function err(name:String, message:String, ?f:Array<Dynamic>)
 		return new EnumByName(ReqlError, name, [new StringStartsWith(message), new Anything(), new Anything()]);
-	}
-	function err_regex(name:String, pattern:String, f:Array<Dynamic>) {
+	
+	function err_regex(name:String, pattern:String, ?f:Array<Dynamic>)
 		return new EnumByName(ReqlError, name, [new Regex(new EReg(pattern, '')), new Anything(), new Anything()]);
-	}
-	function int_cmp(v:Int) {
+	
+	function int_cmp(v:Int)
 		return v;
-	}
-	function float_cmp(v:Float) {
+	
+	function float_cmp(v:Float)
 		return v;
-	}
+	
 	
 	@:async public function run() {
 		total = 0;
@@ -103,11 +104,11 @@ class TestBase {
 }
 
 class Uuid implements deepequal.CustomCompare {
-	public function new() {
-		
-	}
+	public function new() {}
 	
 	public function check(other:Dynamic, compare) {
-		return Std.is(other, String) ? Success(Noise) : Failure(new Error('Expected UUID but got $other')); // TODO
+		return Std.is(other, String) ? // TODO
+			Success(Noise) : 
+			Failure(new Error('Expected UUID but got $other'));
 	}
 }

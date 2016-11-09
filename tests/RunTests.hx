@@ -25,10 +25,10 @@ class RunTests {
 		var tests = [
 			// >>>>
 			// new TestArity(conn),
-			// new TestControl(conn),
-			new TestDefault(conn),
-			new TestMatch(conn),
-			new TestPolymorphism(conn),
+			new TestControl(conn),
+			// new TestDefault(conn),
+			// new TestMatch(conn),
+			// new TestPolymorphism(conn),
 			// new TestSelection(conn),
 			// new TestTimeout(conn),
 			// new changefeeds.TestIdxcopy(conn),

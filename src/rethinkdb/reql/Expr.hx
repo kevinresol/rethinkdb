@@ -102,7 +102,7 @@ abstract Expr(Term) from Term to Term {
 	@:from public static inline function ofBool(v:Bool):Expr return TDatum(DBool(v));
 	@:from public static inline function ofObject(v:{}):Expr return TDatum(DatumTools.ofAny(v));
 	@:from public static inline function ofTerm(v:Term):Expr return v;
-	// @:from public static inline function ofAny(v:Dynamic):Expr return TDatum(DatumTools.ofAny(v));
+	@:from public static inline function ofAny(v:Dynamic):Expr return TDatum(DatumTools.ofAny(v));
 		
 	@:op(A+B) public inline function opAdd(b:Expr):Expr return add(b);
 	@:op(A-B) public inline function opSub(b:Expr):Expr return sub(b);
@@ -215,8 +215,8 @@ abstract Expr(Term) from Term to Term {
 		return TReduce([this, (f:Expr)]);
 	public inline function fold(base:Expr, f:Expr->Expr->Expr):Expr
 		return TFold([this, base, (f:Expr)]);
-	public inline function count():Expr // TODO: optional arguments
-		return TCount([this]);
+	public inline function count(?v:Expr):Expr // TODO: optional arguments
+		return TCount(v == null ? [this] : [this, v]);
 	public inline function sum():Expr // TODO: optional arguments
 		return TSum([this]);
 	public inline function avg():Expr

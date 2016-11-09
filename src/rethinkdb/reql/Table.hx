@@ -7,6 +7,10 @@ import tink.protocol.rethinkdb.Datum;
 @:forward
 abstract Table(Expr) from Term to Term to Expr {
 	
+	@:arrayAccess
+	public inline function opBracket(v:Expr)
+		return this.bracket(v);
+	
 	public inline function indexCreate(name:Expr):Expr
 		return TIndexCreate([name]);
 	public inline function indexDrop(name:Expr):Expr
