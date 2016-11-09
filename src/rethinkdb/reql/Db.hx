@@ -8,11 +8,11 @@ abstract Db(Expr) from Expr to Expr {
 	public inline function run(conn:Connection)
 		return this.run(conn);
 	public inline function tableCreate(name:Expr):Expr
-		return TTableCreate([name]);
+		return TTableCreate([this, name]);
 	public inline function tableDrop(name:Expr):Expr
-		return TTableDrop([name]);
+		return TTableDrop([this, name]);
 	public inline function tableList():Expr
-		return TTableDrop([]);
+		return TTableList([this]);
 	public inline function table(name:Expr):Table
 		return TTable([this, name]);
 		

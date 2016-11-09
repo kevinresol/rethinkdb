@@ -50,6 +50,7 @@ class Response {
 		var type:ResponseType = res.t;
 		
 		inline function fail(ctor:String->Term->Backtrace->ReqlError, ?pos:haxe.PosInfos) {
+			trace(query.toString());
 			var err = ctor(res.r[0], query.term, Backtrace.parse(res.b));
 			return Failure(Error.withData(err.getName() + ': ' + res.r[0], err, pos));
 		}
