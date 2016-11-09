@@ -16,7 +16,7 @@ abstract Table(Expr) from Term to Term to Expr {
 	public inline function indexDrop(name:Expr):Expr
 		return TIndexDrop([this, name]);
 	public inline function indexList():Expr
-		return TIndexDrop([this]);
+		return TIndexList([this]);
 	public inline function indexRename(oldName:Expr, newName:Expr):Expr
 		return TIndexRename([this, oldName, newName]);
 	public inline function indexStatus():Expr
