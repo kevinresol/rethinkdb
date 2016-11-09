@@ -12,17 +12,17 @@ abstract Table(Expr) from Term to Term to Expr {
 		return this.bracket(v);
 	
 	public inline function indexCreate(name:Expr):Expr
-		return TIndexCreate([name]);
+		return TIndexCreate([this, name]);
 	public inline function indexDrop(name:Expr):Expr
-		return TIndexDrop([name]);
+		return TIndexDrop([this, name]);
 	public inline function indexList():Expr
-		return TIndexDrop([]);
+		return TIndexDrop([this]);
 	public inline function indexRename(oldName:Expr, newName:Expr):Expr
-		return TIndexRename([oldName, newName]);
+		return TIndexRename([this, oldName, newName]);
 	public inline function indexStatus():Expr
-		return TIndexStatus([]);
+		return TIndexStatus([this]);
 	public inline function indexWait():Expr
-		return TIndexWait([]);
+		return TIndexWait([this]);
 	
 	// Writing data
 	public inline function insert(v:Expr):Expr
