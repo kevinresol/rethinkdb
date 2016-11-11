@@ -116,6 +116,8 @@ abstract Expr(Term) from Term to Term {
 	@:op(A<B) public inline function opLt(b:Expr):Expr return lt(b);
 	@:op(A<=B) public inline function opLe(b:Expr):Expr return le(b);
 	@:op(!A) public inline function opNot():Expr return not();
+	@:op(A||B) public inline function opOr(b:Expr):Expr return or(b);
+	@:op(A&&B) public inline function opAnd(b:Expr):Expr return and(b);
 	
 	@:op(A+B) public static inline function floatBinopAdd(a:Float, b:Expr):Expr return (a:Expr).add(b);
 	@:op(A-B) public static inline function floatBinopSub(a:Float, b:Expr):Expr return (a:Expr).sub(b);
