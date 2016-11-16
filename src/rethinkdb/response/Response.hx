@@ -2,6 +2,7 @@ package rethinkdb.response;
 
 import haxe.Json;
 import haxe.Int64;
+import haxe.crypto.Base64;
 import tink.protocol.rethinkdb.Query;
 import tink.protocol.rethinkdb.Term;
 import tink.protocol.rethinkdb.Response as RawResponse;
@@ -40,7 +41,7 @@ class Response {
 		this.token = query.token;
 		
 		this.type = type; 
-		this.response = response;
+		this.response = convert(response);
 		this.profile = profile;
 		this.notes = notes;
 	}
@@ -93,4 +94,22 @@ class Response {
 			case SUCCESS_ATOM | SERVER_INFO: Success(response[0]); 
 			default: trace(this); Failure(Error.withData('Cannot cast to Atom', ReqlDriverError('Invalid cast', query.term, [])));
 		}
+		
+	function convert(data:Dynamic):Dynamic {
+		if(data == null || Std.is(data, String) || Std.is(data, Float) || Std.is(data, Bool)) return data;
+		
+		if(Std.is(data, Array)) {
+			var arr:Array<Dynamic> = data;
+			for(i in 0...arr.length) arr[i] = convert(arr[i]);
+			return arr;
+		} else if(Reflect.isObject(data)) {
+			switch Reflect.field(data, "$reql_type$") {
+				case null: for(field in Reflect.fields(data)) Reflect.setField(data, field, convert(Reflect.field(data, field)));
+				case 'TIME': return Date.fromTime(data.epoch_time * 1000);
+				case 'BINARY': return Base64.decode(data.data);
+				default:
+			}
+		}
+		return data;
+	}
 }
