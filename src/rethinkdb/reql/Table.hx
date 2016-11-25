@@ -25,8 +25,8 @@ abstract Table(Expr) from Term to Term to Expr {
 		return TIndexWait([this]);
 	
 	// Writing data
-	public inline function insert(v:Expr):Expr
-		return TInsert([this, v]);
+	public inline function insert(v1:Expr, ?opt:{?conflict:String, ?durability:String, ?return_changes:Bool}):Expr
+		return TInsert([this, v1], opt == null ? null : [for(f in Reflect.fields(opt)) new tink.core.Named.NamedWith(f, TDatum(DatumTools.ofAny(Reflect.field(opt, f))))]);
 	public inline function update(v:Expr):Expr
 		return TUpdate([this, v]);
 	public inline function replace(v:Expr):Expr
