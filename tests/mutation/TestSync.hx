@@ -12,7 +12,7 @@ using tink.CoreApi;
 		var tbl = r.db("test").table("test1");
 		var tbl_soft = r.db("test").table("test1soft");
 		@:await assertAtom(partial({ "created" : 1 }), tbl.indexCreate("x"));
-		@:await assertAtom([{ "ready" : true, "index" : "x" }], tbl.indexWait("x").pluck("index", "ready"));
+		@:await assertAtom(([{ "ready" : true, "index" : "x" }] : Array<Dynamic>), tbl.indexWait("x").pluck("index", "ready"));
 		@:await assertAtom({ "synced" : 1 }, tbl.sync());
 		@:await assertAtom({ "synced" : 1 }, tbl_soft.sync());
 		@:await assertAtom({ "synced" : 1 }, tbl.sync());

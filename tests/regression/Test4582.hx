@@ -11,7 +11,7 @@ using tink.CoreApi;
 		var tbl = r.db("test").table("tbl");
 		@:await assertError(err("ReqlQueryLogicError", "Could not prove argument deterministic.  Maybe you want to use the non_atomic flag?"), tbl.get(0).replace(tbl.get(0)));
 		@:await assertError(err("ReqlQueryLogicError", "Could not prove argument deterministic.  Maybe you want to use the non_atomic flag?"), tbl.get(0).update(tbl.get(0)));
-		@:await assertError(err("ReqlQueryLogicError", "Could not prove argument deterministic.  Maybe you want to use the non_atomic flag?"), tbl.replace(r.args([tbl.get(0)])));
+		@:await assertError(err("ReqlQueryLogicError", "Could not prove argument deterministic.  Maybe you want to use the non_atomic flag?"), tbl.replace(r.args(([tbl.get(0)] : Array<Dynamic>))));
 		@:await dropTables(_tables);
 		return Noise;
 	}

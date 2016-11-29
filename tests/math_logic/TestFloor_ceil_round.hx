@@ -15,7 +15,7 @@ using tink.CoreApi;
 		@:await assertAtom(-1.0, r.floor(-0.5));
 		@:await assertAtom(-1.0, r.floor(-1.0));
 		@:await assertAtom(-2.0, r.floor(-1.5));
-		@:await assertError(err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.", []), r.expr("X").floor());
+		@:await assertError(err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.", ([] : Array<Dynamic>)), r.expr("X").floor());
 		@:await assertAtom("NUMBER", r.ceil(1.0).typeOf());
 		@:await assertAtom(1.0, r.ceil(1.0));
 		@:await assertAtom(1.0, r.expr(1.0).ceil());
@@ -25,7 +25,7 @@ using tink.CoreApi;
 		@:await assertAtom(0.0, r.ceil(-0.5));
 		@:await assertAtom(-1.0, r.ceil(-1.0));
 		@:await assertAtom(-1.0, r.ceil(-1.5));
-		@:await assertError(err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.", []), r.expr("X").ceil());
+		@:await assertError(err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.", ([] : Array<Dynamic>)), r.expr("X").ceil());
 		@:await assertAtom("NUMBER", r.round(1.0).typeOf());
 		@:await assertAtom(1.0, r.round(1.0));
 		@:await assertAtom(1.0, r.expr(1.0).round());
@@ -51,7 +51,7 @@ using tink.CoreApi;
 		@:await assertAtom(-1.0, r.round(-0.9));
 		@:await assertAtom(-10.0, r.round(-9.9));
 		@:await assertAtom(-1000000000.0, r.round(-999999999.9));
-		@:await assertError(err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.", []), r.expr("X").round());
+		@:await assertError(err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.", ([] : Array<Dynamic>)), r.expr("X").round());
 		return Noise;
 	}
 }

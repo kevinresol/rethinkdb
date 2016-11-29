@@ -10,8 +10,8 @@ using tink.CoreApi;
 		@:await createTables(_tables);
 		var tbl = r.db("test").table("tbl");
 		tbl.insert({ "name" : "Jim Brown" });
-		@:await assertError(err("ReqlQueryLogicError", "Could not prove function deterministic.  Index functions must be deterministic.", []), tbl.indexCreate("579", function(rec:Expr):Expr return r.js("1")));
-		@:await assertError(err("ReqlQueryLogicError", "Could not prove function deterministic.  Index functions must be deterministic.", []), tbl.indexCreate("579", function(rec:Expr):Expr return tbl.get(0)));
+		@:await assertError(err("ReqlQueryLogicError", "Could not prove function deterministic.  Index functions must be deterministic.", ([] : Array<Dynamic>)), tbl.indexCreate("579", function(rec:Expr):Expr return r.js("1")));
+		@:await assertError(err("ReqlQueryLogicError", "Could not prove function deterministic.  Index functions must be deterministic.", ([] : Array<Dynamic>)), tbl.indexCreate("579", function(rec:Expr):Expr return tbl.get(0)));
 		@:await dropTables(_tables);
 		return Noise;
 	}

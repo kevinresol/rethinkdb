@@ -9,8 +9,8 @@ using tink.CoreApi;
 		var a = {  };
 		var b = { "a" : a };
 		a["b"] = b;
-		@:await assertError(err("ReqlDriverCompileError", "Nesting depth limit exceeded.", []), r.expr(a));
-		@:await assertError(err("ReqlDriverCompileError", "Nesting depth limit exceeded.", []), r.expr({ "a" : { "a" : { "a" : { "a" : { "a" : { "a" : { "a" : {  } } } } } } } }, 7));
+		@:await assertError(err("ReqlDriverCompileError", "Nesting depth limit exceeded.", ([] : Array<Dynamic>)), r.expr(a));
+		@:await assertError(err("ReqlDriverCompileError", "Nesting depth limit exceeded.", ([] : Array<Dynamic>)), r.expr({ "a" : { "a" : { "a" : { "a" : { "a" : { "a" : { "a" : {  } } } } } } } }, 7));
 		@:await assertAtom(({ "a" : { "a" : { "a" : { "a" : { "a" : { "a" : { "a" : {  } } } } } } } }), r.expr({ "a" : { "a" : { "a" : { "a" : { "a" : { "a" : { "a" : {  } } } } } } } }, 10));
 		return Noise;
 	}

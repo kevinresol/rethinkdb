@@ -13,7 +13,7 @@ using StringTools;
 
 class Main {
 	
-	static var root = '../../rethinkdb/test/rql_test/src';
+	static var root = './yaml';
 	static var tests = [];
 	static var hparser:hscript.Parser;
 	static var hinterp:hscript.Interp;
@@ -56,6 +56,7 @@ class Main {
 	static function preprocess(path = '', ?futures:Array<Future<Noise>>) {
 		#if skip_preprocess return []; #end
 		
+		var root = '../../rethinkdb/test/rql_test/src';
 		if(futures == null) futures = [];
 		for(p in ('$root/$path').readDirectory()) {
 			if('$root/$path/$p'.isDirectory()) preprocess('$path/$p', futures);
@@ -76,12 +77,12 @@ class Main {
 	}
 		
 	static function handleDirectory(path:String) {
-		for(p in ('$root/$path').readDirectory()) {
+		for(p in '$root/$path'.readDirectory()) {
 			if('$root/$path/$p'.isDirectory()) handleDirectory('$path/$p');
 			else if(p.indexOf('.') != p.lastIndexOf('.')) continue;
 			else if(p == 'range.yaml') continue; // skip this, did some manual changes
 			// else if(path.indexOf('datum') == -1) continue;
-			// else if(p != 'object.yaml') continue;
+			// else if(p != 'insert.yaml') continue;
 			// else handleFile('$path/$p');
 			else try handleFile('$path/$p') catch(e:Dynamic) {
 				trace(e);
@@ -126,38 +127,42 @@ class Main {
 				str = null;
 			}
 			if(str != null) {
-				try {
-					
-					function add(str:String) {
+				function add(str:String) {
+					var action = try {
 						var parser = new parser.Parser(byte.ByteData.ofString(str), 'test');
 						var expr = parser.parse();
 						var parsed = printer.print(expr);
-						var action = mapper.map(expr);
-						
+						mapper.map(expr);
+					} catch(e:Dynamic) {
+						trace(str);
+						trace(e);
+						return;
+					}
+					
+					var e = try {
 						var parser = new parser.Parser(byte.ByteData.ofString(out), 'test');
 						var expr = parser.parse();
 						var parsed = printer.print(expr);
-						var e = mapper.map(expr);
-						var assert = switch e {
-							case {expr:ECall({expr: EConst(CIdent('err' | 'err_regex'))}, p)}: 
-								if(p[0].expr.match(EConst(CString("ReqlCompileError")))) return; // skip local compile error for now
-								macro assertError($e, $action);
-							case e: macro assertAtom($e, $action);
-						}
-						// trace(out, new haxe.macro.Printer().printExpr(assert));
-						exprs.push(macro @:await $assert);
+						mapper.map(expr);
+					} catch(e:Dynamic) {
+						trace(out);
+						trace(e);
+						return;
 					}
-					
-					if(Std.is(str, Array)) for(s in (str:Array<String>)) add(s);
-					else add(str);
-					
-					// trace(str, new haxe.macro.Printer().printExpr(exprs[exprs.length - 1]));
-					
-				} catch(e:Dynamic) {
-					// trace(out);
-					trace(e);
-					// keep going
+					var assert = switch e {
+						case {expr:ECall({expr: EConst(CIdent('err' | 'err_regex'))}, p)}: 
+							if(p[0].expr.match(EConst(CString("ReqlCompileError")))) return; // skip local compile error for now
+							macro assertError($e, $action);
+						case e: macro assertAtom($e, $action);
+					}
+					// trace(out, new haxe.macro.Printer().printExpr(assert));
+					exprs.push(macro @:await $assert);
 				}
+				
+				if(Std.is(str, Array)) for(s in (str:Array<String>)) add(s);
+				else add(str);
+				
+				// trace(str, new haxe.macro.Printer().printExpr(exprs[exprs.length - 1]));
 			}
 			if(def != null) {
 				var parser = new parser.Parser(byte.ByteData.ofString(def), 'test');

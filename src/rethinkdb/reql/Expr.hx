@@ -150,7 +150,7 @@ abstract Expr(Term) from Term to Term {
 	// Selecting data
 	public inline function between(lower:Expr, upper:Expr):Expr
 		return TBetween([this, lower, upper]);
-	public inline function filter(f:Expr, ?opt:Options):Expr
+	public inline function filter(f:Expr, ?opt:{}):Expr
 		return TFilter([this, f], opt);
 	
 	// Joins

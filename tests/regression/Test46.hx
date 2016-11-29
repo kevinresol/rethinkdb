@@ -7,7 +7,7 @@ using tink.CoreApi;
 	@:async
 	override function test() {
 		@:await assertAtom(partial({ "tables_created" : 1 }), r.tableCreate("46"));
-		@:await assertAtom(["46"], r.tableList());
+		@:await assertAtom((["46"] : Array<Dynamic>), r.tableList());
 		@:await assertAtom(partial({ "tables_dropped" : 1 }), r.tableDrop("46"));
 		return Noise;
 	}

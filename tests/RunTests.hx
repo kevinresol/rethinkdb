@@ -13,6 +13,7 @@ using tink.CoreApi;
 class RunTests {
 	
 	static function main() {
+		trace('running');
 		run().handle(function(o) switch o {
 			case Success(e): Sys.exit(e);
 			case Failure(e): trace('Unexpected error: $e'); Sys.exit(1);
@@ -25,8 +26,8 @@ class RunTests {
 		var tests = [
 			// >>>>
 			// new TestArity(conn),
-			new TestControl(conn),
-			// new TestDefault(conn),
+			// new TestControl(conn),
+			new TestDefault(conn),
 			// new TestMatch(conn),
 			// new TestPolymorphism(conn),
 			// new TestSelection(conn),

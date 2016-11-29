@@ -63,6 +63,12 @@ class TestBase {
 	}
 	
 	
+	inline function str(v:Dynamic)
+		return Std.string(v);
+	
+	inline function range(s:Int, ?e:Int)
+		return e == null ? 0...s : s...e;
+		
 	inline function xrange(s:Int, ?e:Int)
 		return e == null ? 0...s : s...e;
 	

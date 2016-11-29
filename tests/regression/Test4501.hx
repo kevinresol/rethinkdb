@@ -9,7 +9,7 @@ using tink.CoreApi;
 		var _tables = ["tbl"];
 		@:await createTables(_tables);
 		var tbl = r.db("test").table("tbl");
-		@:await assertError(err_regex("ReqlOpFailedError", "Index `missing` was not found on table `[a-zA-Z0-9_]+.[a-zA-Z0-9_]+`[.]", [0]), tbl.indexWait("missing"));
+		@:await assertError(err_regex("ReqlOpFailedError", "Index `missing` was not found on table `[a-zA-Z0-9_]+.[a-zA-Z0-9_]+`[.]", ([0] : Array<Dynamic>)), tbl.indexWait("missing"));
 		@:await dropTables(_tables);
 		return Noise;
 	}

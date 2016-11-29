@@ -1,6 +1,8 @@
 package parser;
 
 import haxe.macro.Expr.ExprDef;
+import haxe.macro.Expr.Binop;
+import haxe.macro.Expr.Unop;
 using StringTools;
 
 enum Token {
@@ -20,6 +22,7 @@ enum Token {
 	TLambda;
 	
 	TBinop(op:Binop);
+	TUnop(op:Unop);
 	
 	TNumber(v:String);
 	TString(v:String);
@@ -28,22 +31,13 @@ enum Token {
 	TEof;
 }
 
-enum Binop {
-	OpAdd;
-	OpSub;
-	OpDiv;
-	OpMul;
-	OpMod;
-	OpAssign;
-	OpInterval;
-}
-
 enum Expr {
 	EConst(c:Const);
 	EField(e:Expr, field:String);
 	ECall(e:Expr, args:Array<Expr>);
 	EArrayAccess(e:Expr, e1:Expr);
 	EBinop(op:Binop, e1:Expr, e2:Expr);
+	EUnop(op:Unop, post:Bool, e:Expr);
 	ELambda(args:Array<String>, expr:Expr);
 	EObjectDecl(fields:Array<{field:String, expr:Expr}>);
 	EArrayDecl(values:Array<Expr>);
@@ -73,10 +67,18 @@ class Lexer extends hxparse.Lexer implements hxparse.RuleBuilder {
 		"}" => TBrClose,
 		"\\+" => TBinop(OpAdd),
 		"\\-" => TBinop(OpSub),
-		"\\*" => TBinop(OpMul),
+		"\\*" => TBinop(OpMult),
 		"\\/" => TBinop(OpDiv),
 		"\\%" => TBinop(OpMod),
 		"\\=" => TBinop(OpAssign),
+		"\\=\\=" => TBinop(OpEq),
+		"\\>\\=" => TBinop(OpGte),
+		"\\<\\=" => TBinop(OpLte),
+		"\\>" => TBinop(OpGt),
+		"\\<" => TBinop(OpLt),
+		"\\!\\=" => TBinop(OpNotEq),
+		"\\&" => TBinop(OpAnd),
+		"\\~" => TUnop(OpNot),
 		"," => TComma,
 		";" => TSemicolon,
 		":" => TColon,
@@ -85,6 +87,7 @@ class Lexer extends hxparse.Lexer implements hxparse.RuleBuilder {
 		"in" => TIn,
 		"True" => TIdent("true"),
 		"False" => TIdent("false"),
+		"None" => TIdent("null"),
 		"lambda" => TLambda,
 		"-?(([1-9][0-9]*)|0)(\\.[0-9]+)?([eE][\\+\\-]?[0-9]?)?" => TNumber(lexer.current),
 		'"' => {
@@ -172,7 +175,11 @@ class Parser extends hxparse.Parser<hxparse.LexerTokenSource<Token>, Token> impl
 					case EObjectDecl(_): next(e);
 					case e: e;
 				}
-			case [TPOpen, e = expr(), TPClose]: next(EParenthesis(e));
+			case [TPOpen, e = arrDeclOrExpr(), TPClose]: 
+				switch e {
+					case EArrayDecl(_): next(e);
+					case _: next(EParenthesis(e));
+				}
 			case [TLambda, p = funcArgs(), TColon, e = expr()]:
 				var e = switch e {
 					case EBlock(exprs): switch exprs[exprs.length - 1] {
@@ -282,6 +289,21 @@ class Parser extends hxparse.Parser<hxparse.LexerTokenSource<Token>, Token> impl
 		return ret;
 	}
 	
+	function arrDeclOrExpr() {
+		var ret = [];
+		switch stream {
+			case [e = expr()]: ret.push(e);
+			case _: unexpected();
+		}
+		while(true) {
+			switch stream {
+				case [TComma, e = expr()]: ret.push(e);
+				case _: break;
+			}
+		}
+		return ret.length > 1 ? EArrayDecl(ret) : ret[0];
+	}
+	
 	function arrDecl() {
 		var ret = [];
 		switch stream {
@@ -321,6 +343,7 @@ class Printer {
 			case EConst(c): const(c);
 			case EField(e, field): print(e) + '.$field';
 			case ECall(e, args): print(e) + '(' + [for(a in args) print(a)].join(', ') + ')';
+			case EUnop(op, post, e): if(post) print(e) + unop(op) else unop(op) + print(e);
 			case EBinop(op, e1, e2): print(e1) + binop(op) + print(e2);
 			case ELambda(args, e): 'function(${args.join(", ")}) ' + print(e);
 			case EObjectDecl(fields): '{' + [for(f in fields) f.field + ':' + print(f.expr)].join(', ') + '}';
@@ -341,15 +364,10 @@ class Printer {
 		}
 		
 	static function binop(op:Binop) 
-		return switch op {
-			case OpAdd: ' + ';
-			case OpSub: ' - ';
-			case OpDiv: ' * ';
-			case OpMul: ' / ';
-			case OpMod: ' % ';
-			case OpAssign: ' = ';
-			case OpInterval: '...';
-		}
+		return new haxe.macro.Printer().printBinop(op);
+		
+	static function unop(op:Unop) 
+		return new haxe.macro.Printer().printUnop(op);
 }
 
 class Mapper {
@@ -385,22 +403,15 @@ class Mapper {
 				// convert `r(value)` to `r.expr(value)`
 				if(e.match(EConst(CIdent('r')))) e = EField(EConst(CIdent('r')), 'expr'); 
 				ExprDef.ECall(map(e), args.map(map));
-			case EBinop(op, e1, e2): ExprDef.EBinop(switch op {
-				case OpAdd: OpAdd;
-				case OpSub: OpSub;
-				case OpDiv: OpDiv;
-				case OpMul: OpMult;
-				case OpMod: OpMod;
-				case OpAssign: OpAssign;
-				case OpInterval: OpInterval;
-			}, map(e1), map(e2));
+			case EBinop(op, e1, e2): ExprDef.EBinop(op, map(e1), map(e2));
+			case EUnop(op, post, e): ExprDef.EUnop(op, post, map(e));
 			case ELambda(args, e): ExprDef.EFunction(null, {
 					args: args.map(function(a) return {name: a, meta: null, opt: null, type: macro:Expr, value: null}),
 					expr: map(e),
 					ret: macro:Expr,
 				});
 			case EObjectDecl(fields): ExprDef.EObjectDecl(fields.map(function(f) return {field: f.field, expr: map(f.expr)}));
-			case EArrayDecl(fields): ExprDef.EArrayDecl(fields.map(map));
+			case EArrayDecl(fields): ExprDef.ECheckType({pos: null, expr:ExprDef.EArrayDecl(fields.map(map))}, macro:Array<Dynamic>);
 			case EParenthesis(e): ExprDef.EParenthesis(map(e));
 			case EArrayAccess(e, e1): ExprDef.EArray(map(e), map(e1));
 			case EBlock(exprs): ExprDef.EBlock(exprs.map(map));

@@ -10,7 +10,7 @@ using tink.CoreApi;
 		@:await createTables(_tables);
 		var tbl = r.db("test").table("tbl");
 		var obj = r.expr({ "id" : 0, "a" : 0 });
-		@:await assertAtom(({ "deleted" : 0, "replaced" : 0, "unchanged" : 0, "errors" : 0, "skipped" : 0, "inserted" : 3 }), tbl.insert([for (i in xrange(3)) { "id" : i, "a" : i }]));
+		@:await assertAtom(({ "deleted" : 0, "replaced" : 0, "unchanged" : 0, "errors" : 0, "skipped" : 0, "inserted" : 3 }), tbl.insert(([for (i in xrange(3)) { "id" : i, "a" : i }] : Array<Dynamic>)));
 		@:await assertAtom(({ "id" : 0, "c" : 1, "a" : 0 }), tbl.merge({ "c" : 1 }).nth(0));
 		@:await assertAtom(({ "id" : 0, "c" : 1, "a" : 0 }), obj.merge({ "c" : 1 }));
 		@:await assertAtom(({ "id" : 0 }), tbl.without("a").nth(0));

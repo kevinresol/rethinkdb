@@ -7,8 +7,8 @@ import tink.protocol.rethinkdb.Term;
 abstract Db(Expr) from Expr to Expr {
 	public inline function run(conn:Connection)
 		return this.run(conn);
-	public inline function tableCreate(name:Expr):Expr
-		return TTableCreate([this, name]);
+	public inline function tableCreate(name:Expr, ?opt:{?primary_key:String, ?durability:String, ?shards:Int, ?replicas:Int, ?primary_replica_tag:String}):Expr
+		return TTableCreate([this, name], opt);
 	public inline function tableDrop(name:Expr):Expr
 		return TTableDrop([this, name]);
 	public inline function tableList():Expr
