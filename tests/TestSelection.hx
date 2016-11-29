@@ -72,7 +72,7 @@ using tink.CoreApi;
 		@:await assertAtom(([4, 5] : Array<Dynamic>), r.expr(([1, 2, 3, 4, 5] : Array<Dynamic>)).filter(r.row > 2).filter(r.row > 3));
 		var nested = r.expr(([([1, 2] : Array<Dynamic>), ([3, 4] : Array<Dynamic>), ([5, 6] : Array<Dynamic>)] : Array<Dynamic>));
 		@:await assertAtom(([([3, 4] : Array<Dynamic>), ([5, 6] : Array<Dynamic>)] : Array<Dynamic>), nested.filter(function(x:Expr):Expr return x.filter(function(y:Expr):Expr return y >= 4).count() > 0));
-		@:await assertAtom(([([3, 4] : Array<Dynamic>), ([5, 6] : Array<Dynamic>)] : Array<Dynamic>), nested.filter(r.row.filter(function(y:Expr):Expr return y >= 4).count() > 0));
+		@:await assertAtom((([([3, 4] : Array<Dynamic>), ([5, 6] : Array<Dynamic>)] : Array<Dynamic>)), nested.filter(r.row.filter(function(y:Expr):Expr return y >= 4).count() > 0));
 		@:await assertAtom(([{ "a" : 1, "b" : 2, "c" : 3 }] : Array<Dynamic>), r.expr(([{ "a" : 1, "b" : 1, "c" : 3 }, { "a" : 1, "b" : 2, "c" : 3 }] : Array<Dynamic>)).filter({ "a" : 1, "b" : 2 }));
 		@:await assertAtom(([{ "a" : 1, "b" : 1, "c" : 3 }, { "a" : 1, "b" : 2, "c" : 3 }] : Array<Dynamic>), r.expr(([{ "a" : 1, "b" : 1, "c" : 3 }, { "a" : 1, "b" : 2, "c" : 3 }] : Array<Dynamic>)).filter({ "a" : 1 }));
 		@:await assertAtom(([{ "a" : 1, "b" : 1, "c" : 3 }] : Array<Dynamic>), r.expr(([{ "a" : 1, "b" : 1, "c" : 3 }, { "a" : 1, "b" : 2, "c" : 3 }] : Array<Dynamic>)).filter({ "a" : r.row["b"] }));

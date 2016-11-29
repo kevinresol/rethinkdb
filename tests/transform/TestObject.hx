@@ -42,12 +42,12 @@ using tink.CoreApi;
 		@:await assertError(err("ReqlQueryLogicError", errmsg, ([] : Array<Dynamic>)), obj.merge({ "foo" : r.literal(r.literal("foo")) }));
 		var o = r.expr({ "a" : { "b" : 1, "c" : 2 }, "d" : 3 });
 		@:await assertAtom(({ "a" : { "b" : 1, "c" : 2 }, "d" : 3, "e" : 4, "f" : 5 }), o.merge({ "e" : 4 }, { "f" : 5 }));
-		@:await assertAtom(([{ "a" : { "b" : 1, "c" : 2 }, "d" : 3, "e" : 3 }, { "a" : { "b" : 1, "c" : 2 }, "d" : 4, "e" : 4 }] : Array<Dynamic>), r.expr(([o, o.merge({ "d" : 4 })] : Array<Dynamic>)).merge(function(row:Expr):Expr return { "e" : row["d"] }));
-		@:await assertAtom(([{ "a" : { "b" : 1, "c" : 2 }, "d" : 3, "e" : 3 }, { "a" : { "b" : 1, "c" : 2 }, "d" : 4, "e" : 4 }] : Array<Dynamic>), r.expr(([o, o.merge({ "d" : 4 })] : Array<Dynamic>)).merge({ "e" : r.row["d"] }));
-		@:await assertAtom(([{ "a" : { "b" : 2, "c" : 2 }, "d" : 3 }, { "a" : { "b" : 2, "c" : 2 }, "d" : 4 }] : Array<Dynamic>), r.expr(([o, o.merge({ "d" : 4 })] : Array<Dynamic>)).merge(function(row:Expr):Expr return { "a" : { "b" : 2 } }));
-		@:await assertAtom(([{ "a" : { "b" : 2 }, "d" : 3 }, { "a" : { "b" : 2 }, "d" : 4 }] : Array<Dynamic>), r.expr(([o, o.merge({ "d" : 4 })] : Array<Dynamic>)).merge(function(row:Expr):Expr return { "a" : r.literal({ "b" : 2 }) }));
-		@:await assertAtom((["a", "b", "c", "d", "e"] : Array<Dynamic>), obj.keys());
-		@:await assertAtom(([1, 2, "str", null, { "f" : "buzz" }] : Array<Dynamic>), obj.values());
+		@:await assertAtom((([{ "a" : { "b" : 1, "c" : 2 }, "d" : 3, "e" : 3 }, { "a" : { "b" : 1, "c" : 2 }, "d" : 4, "e" : 4 }] : Array<Dynamic>)), r.expr(([o, o.merge({ "d" : 4 })] : Array<Dynamic>)).merge(function(row:Expr):Expr return { "e" : row["d"] }));
+		@:await assertAtom((([{ "a" : { "b" : 1, "c" : 2 }, "d" : 3, "e" : 3 }, { "a" : { "b" : 1, "c" : 2 }, "d" : 4, "e" : 4 }] : Array<Dynamic>)), r.expr(([o, o.merge({ "d" : 4 })] : Array<Dynamic>)).merge({ "e" : r.row["d"] }));
+		@:await assertAtom((([{ "a" : { "b" : 2, "c" : 2 }, "d" : 3 }, { "a" : { "b" : 2, "c" : 2 }, "d" : 4 }] : Array<Dynamic>)), r.expr(([o, o.merge({ "d" : 4 })] : Array<Dynamic>)).merge(function(row:Expr):Expr return { "a" : { "b" : 2 } }));
+		@:await assertAtom((([{ "a" : { "b" : 2 }, "d" : 3 }, { "a" : { "b" : 2 }, "d" : 4 }] : Array<Dynamic>)), r.expr(([o, o.merge({ "d" : 4 })] : Array<Dynamic>)).merge(function(row:Expr):Expr return { "a" : r.literal({ "b" : 2 }) }));
+		@:await assertAtom(((["a", "b", "c", "d", "e"] : Array<Dynamic>)), obj.keys());
+		@:await assertAtom((([1, 2, "str", null, { "f" : "buzz" }] : Array<Dynamic>)), obj.values());
 		@:await assertAtom(5, obj.count());
 		return Noise;
 	}

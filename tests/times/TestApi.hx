@@ -52,8 +52,8 @@ using tink.CoreApi;
 		@:await assertAtom(0, (r.now() - r.now()));
 		@:await assertError(err("ReqlQueryLogicError", "ISO 8601 string has no time zone, and no default time zone was provided.", ([] : Array<Dynamic>)), r.iso8601("2013-07-30T20:56:05").toIso8601());
 		@:await assertAtom(("2013-07-30T20:56:05-07:00"), r.iso8601("2013-07-30T20:56:05", { "default_timezone" : "-07" }).toIso8601());
-		@:await assertAtom(([1, 2, 3, 4, 5, 6, 7] : Array<Dynamic>), r.expr(([r.monday, r.tuesday, r.wednesday, r.thursday, r.friday, r.saturday, r.sunday] : Array<Dynamic>)));
-		@:await assertAtom(([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : Array<Dynamic>), r.expr(([r.january, r.february, r.march, r.april, r.may, r.june, r.july, r.august, r.september, r.october, r.november, r.december] : Array<Dynamic>)));
+		@:await assertAtom((([1, 2, 3, 4, 5, 6, 7] : Array<Dynamic>)), r.expr(([r.monday, r.tuesday, r.wednesday, r.thursday, r.friday, r.saturday, r.sunday] : Array<Dynamic>)));
+		@:await assertAtom((([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : Array<Dynamic>)), r.expr(([r.january, r.february, r.march, r.april, r.may, r.june, r.july, r.august, r.september, r.october, r.november, r.december] : Array<Dynamic>)));
 		return Noise;
 	}
 }

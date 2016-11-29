@@ -175,11 +175,7 @@ class Parser extends hxparse.Parser<hxparse.LexerTokenSource<Token>, Token> impl
 					case EObjectDecl(_): next(e);
 					case e: e;
 				}
-			case [TPOpen, e = arrDeclOrExpr(), TPClose]: 
-				switch e {
-					case EArrayDecl(_): next(e);
-					case _: next(EParenthesis(e));
-				}
+			case [TPOpen, e = paren(), TPClose]: next(e);
 			case [TLambda, p = funcArgs(), TColon, e = expr()]:
 				var e = switch e {
 					case EBlock(exprs): switch exprs[exprs.length - 1] {
@@ -289,7 +285,7 @@ class Parser extends hxparse.Parser<hxparse.LexerTokenSource<Token>, Token> impl
 		return ret;
 	}
 	
-	function arrDeclOrExpr() {
+	function paren() {
 		var ret = [];
 		switch stream {
 			case [e = expr()]: ret.push(e);
@@ -301,7 +297,7 @@ class Parser extends hxparse.Parser<hxparse.LexerTokenSource<Token>, Token> impl
 				case _: break;
 			}
 		}
-		return ret.length > 1 ? EArrayDecl(ret) : ret[0];
+		return ret.length > 1 ? EArrayDecl(ret) : EParenthesis(ret[0]);
 	}
 	
 	function arrDecl() {
