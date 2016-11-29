@@ -36,7 +36,7 @@ class TestBase {
 	
 	function assertAtom<T>(v:T, e:Expr, ?pos:haxe.PosInfos) {
 		var f = e.run(conn).asAtom().map(function(o) return switch o {
-			case Success(ret): compare(v, ret);
+			case Success(ret): compare(v, ret, pos);
 			case Failure(f): Failure(new Error('Unexpected error $f', pos));
 		});
 		
@@ -46,7 +46,7 @@ class TestBase {
 	function assertError<T>(v:T, e:Expr, ?pos:haxe.PosInfos) {
 		var f = e.run(conn).asAtom().map(function(o) return switch o {
 			case Success(_): Failure(new Error("Unexpected failure", pos));
-			case Failure(f): compare(v, f.data);
+			case Failure(f): compare(v, f.data, pos);
 		});
 		
 		return handle(f);
