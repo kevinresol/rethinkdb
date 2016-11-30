@@ -106,6 +106,11 @@ class Response {
 				case null: for(field in Reflect.fields(data)) Reflect.setField(data, field, convert(Reflect.field(data, field)));
 				case 'TIME': return Date.fromTime(data.epoch_time * 1000);
 				case 'BINARY': return Base64.decode(data.data);
+				case 'GROUPED_DATA':
+					return [for(entry in (data.data:Array<Array<Dynamic>>)) {
+						group: entry[0],
+						reduction: entry[1],
+					}];
 				default:
 			}
 		}
