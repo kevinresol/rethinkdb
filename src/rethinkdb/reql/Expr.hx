@@ -388,8 +388,8 @@ abstract Expr(Term) from Term to Term {
 		return TInTimezone([this, v]);
 	public inline function timezone():Expr
 		return TTimezone([this]);
-	public inline function during(start:Expr, end:Expr):Expr
-		return TDuring([this, start, end]);
+	public inline function during(start:Expr, end:Expr, ?opt:{?left_bound:Expr, ?right_bound:Expr}):Expr
+		return TDuring([this, start, end], opt);
 	public inline function date():Expr
 		return TDate([this]);
 	public inline function timeOfDay():Expr
